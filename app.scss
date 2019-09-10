@@ -1,0 +1,131 @@
+$dark-blue:#0A5087;
+$yellow:#FFCE6D;
+
+#tanf8-20-19 {
+  background-color:#0A5087;
+  width:640px;
+  margin-left:auto;
+  margin-right:auto;
+  margin-top:20px;
+  padding:20px;
+  .border {
+    border:1px solid #fff;
+  }
+  color:#fff;
+  font-family:"proxima nova condensed",sans-serif;
+  box-sizing:border-box;
+  .barLabel {
+    vertical-align:middle;
+    color:#000;
+    font-size:22pt;
+    padding-left:12pt;
+    padding-right:12pt;
+    box-sizing:border-box;
+    & > div {
+      vertical-align:middle;
+      display:inline-block;
+      line-height:1.1;
+      width:100%;
+    }
+    .spacer {
+      height:100%;
+      width:0px;
+    }
+  }
+  .animation-wrap {
+    height:0;
+    padding-bottom:50%;
+    position:relative;
+    .explainer {
+      position:absolute;
+      font-size:24pt;
+      color:#fff;
+      p:first-child {
+        margin-top:0;
+      }
+    }
+    .animation-inner {
+      position:absolute;
+      width:100%;
+      height:100%;
+      .sublabel {
+        position:absolute;
+        padding:15px;
+        padding-top:30px;
+        font-size:24pt;
+        color:$dark-blue;
+        box-sizing:border-box;
+        line-height:1.2;
+        > strong {
+          font-size:120%;
+        }
+        hyphens:auto;
+      }
+      .top1label {
+        text-align:left;
+      }
+      .next39Label {
+        text-align:center;
+        padding:50px;
+        padding-top:30px;
+      }
+      .bottom60label {
+        text-align:center;
+        font-size:18pt;
+        padding:5px;
+        line-height:1.1;
+        padding-top:30px;
+      }
+      > svg {
+        width:100%;
+        height:100%;
+      }
+      .top1PieWrap, .bottom60PieWrap {
+        position:absolute;
+        font-size:24pt;
+        > svg {
+          width:100%;
+          height:100%;
+          position:absolute;
+          text {
+            fill:#fff;
+          }
+        }
+      }
+    }
+  }
+  h1.title {
+    margin:20pt;
+    margin-bottom:0;
+    font-size:34pt;
+    font-family:"rift", sans-serif;
+    font-weight:600;
+    text-transform:uppercase;
+    color:$yellow;
+    line-height:1.2;
+  }
+  h2.subtitle {
+    padding-top:0;
+    margin-top:0;
+    font-weight:400;
+    font-size:26pt;
+    text-align:center;
+    line-height:1;
+  }
+  p.source {
+    font-family:"proxima-nova",sans-serif;
+    font-size:14pt;
+    text-align:left;
+    width:90%;
+    margin-left:auto;
+    margin-right:auto;
+  }
+  .credit {
+    font-size:16pt;
+    color:#6DA0C8;
+    text-transform:uppercase;
+    font-family:"Helvetica Neue","Arial",sans-serif;
+    text-align:center;
+    margin-bottom:1em;
+  }
+}

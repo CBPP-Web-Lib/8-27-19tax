@@ -1,0 +1,21 @@
+{
+  "name": "tax8-27-19",
+  "version": "0.1.0",
+  "description": "Buffet Gif",
+  "dependencies": {
+    "@babel/polyfill": "^7.2.5",
+    "cbpp_figures": "github:CenterOnBudget/cbpp_figure",
+    "comma-number": "^2.0.0",
+    "d3": "^5.10.0",
+    "jquery": "^1.12.4"
+  },
+  "devDependencies": {
+    "cbpp_shared_gulp": "github:CenterOnBudget/cbpp_shared_gulp",
+    "raw-loader": "^1.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nick Kasprak",
+  "license": "ISC"
+}
