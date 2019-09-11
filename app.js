@@ -50,7 +50,17 @@ function ready() {
       moveGroups(2500)
     ]))
     .then(highlightAGI(2500))
-    .then(zoomInMore(2500));
+    .then(zoomInMore(2500))
+    .then(highlightTax(2500))
+    .then(waitFor(1000))
+    .then(doMultiple([
+      zoomIn(5000)
+    ]))
+    .then(doMultiple([
+      zoomBackOut(2000),
+      moveGroupsBack(2000),
+      removeMillionLines(2000)
+    ]));
    // .then(drawInitialLine(500))
     //.then(drawFirstBar(500))
    // .then(writeFirstLabel(500))
@@ -349,7 +359,8 @@ var highlightAGI = PromiseMaker(function(cb, duration) {
     .duration(duration)
     .attr("opacity",0.3)
     .on("end",cb);
-  g.AGIRects.attr("fill","#ECF2F8"); 
+  g.AGIRects.attr("fill","#ECF2F8")
+    .attr("class","highlighted");
   /*3180 4400 100 50*/
 });
 
@@ -363,6 +374,64 @@ var zoomInMore = PromiseMaker(function(cb, duration) {
     .duration(duration)
     .attr("stroke-width",0.2);
 
+});
+
+var highlightTax = PromiseMaker(function(cb, duration) {
+  var ysize = 11.6;
+  var xsize = 7.175;
+  var margin = 0.2;
+  var xbottom = 3367.5;
+  var yright = 4467.5;
+  var tax = 1.845557;
+  var rect1 = drawGrid(1,1, xbottom-1*(xsize+margin)+margin/2, yright - 1*(ysize+margin)+margin/2, margin, xsize, ysize);
+  var rect2 = drawGrid(1,1, xbottom-1*(xsize+margin)+margin/2, yright - tax*(ysize+margin)+margin/2, margin, xsize, ysize*(tax-1));
+  g.taxRects = d3.selectAll(rect1.nodes().concat(rect2.nodes()));
+  g.taxRects.attr("fill","#FFCE6D")
+    .attr("class","highlighted");
+  g.taxRects.attr("opacity",0)
+    .transition()
+    .duration(duration)
+    .attr("opacity",1)
+    .on("end",cb);
+});
+
+var zoomBackOut = PromiseMaker(function(cb, duration) {
+  g.svg.transition()
+    .duration(duration)
+    .attr("viewBox","0 0 10000 5000")
+    .on("end", cb);
+});
+
+var removeMillionLines = PromiseMaker(function(cb, duration) {
+  g.millionLines.transition()
+    .duration(duration)
+    .attr("opacity",0)
+    .on("end", function() {
+      d3.select(this).remove();
+      cb();
+    });
+});
+
+var moveGroupsBack = PromiseMaker(function(cb, duration) {
+  g.svg.selectAll(".billionBox").each(function() {
+    var self = d3.select(this);
+    self.transition()
+      .duration(duration)
+      .attr("width",self.attr("data-orgwidth"))
+      .attr("height",self.attr("data-orgheight"))
+      .attr("x",self.attr("data-orgx"))
+      .attr("y", self.attr("data-orgy"))
+      .on("end", cb);
+  });
+  g.svg.selectAll(".highlighted").each(function() {
+    var self = d3.select(this);
+    var x = self.attr("x")*1;
+    var y = self.attr("y")*1;
+    self.transition()
+      .duration(duration)
+      .attr("x",x-55/2)
+      .attr("y",y-55/2);
+  });
 });
 
 var fadeOut = PromiseMaker(function(cb, duration) {
