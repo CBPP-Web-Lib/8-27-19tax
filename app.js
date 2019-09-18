@@ -33,8 +33,13 @@ function ready() {
   script.before(wrap); 
   wrap.html(g.DOM);
   g.svg = d3.select(".animation-inner").append("svg")
-    .attr("viewBox","0 0 10000 5000");
+    .attr("viewBox","0 0 100 50");
+
   waitFor(200)()
+    .then(drawOneMillion(500))
+    .then(describeOneMillion(500));
+
+  /*waitFor(200)()
     .then(drawOneBillion(500))
     .then(drawInitialLabel(500))
     .then(waitFor(1000))
@@ -47,7 +52,8 @@ function ready() {
     .then(doMultiple([
       zoomIn(2500),
       divBlocks(2495, 5),
-      moveGroups(2500)
+      moveGroups(2500),
+      fadeOut65BillionDesc(1000)
     ]))
     .then(highlightAGI(2500))
     .then(zoomInMore(2500))
@@ -60,7 +66,7 @@ function ready() {
       zoomBackOut(2000),
       moveGroupsBack(2000),
       removeMillionLines(2000)
-    ]));
+    ]));*/
    // .then(drawInitialLine(500))
     //.then(drawFirstBar(500))
    // .then(writeFirstLabel(500))
@@ -127,6 +133,54 @@ g.formatters.percent = function(x, m, round) {
   return (Math.round(x*m*round)/round) + "%";
 };
 
+g.billionSizeHoz = 100;
+g.billionSizeVert = 48;
+g.millionMargin = 1;
+g.billionMargin = 5;
+g.millionHoz = 40;
+g.millionVert = 25;
+
+g.millionSizeHoz = g.billionSizeHoz / g.millionHoz - g.millionMargin/2 + g.millionMargin/g.millionHoz;
+g.millionSizeVert = g.billionSizeVert / g.millionVert - g.millionMargin/2 + g.millionMargin/g.millionVert;
+
+
+
+var drawOneMillion = PromiseMaker(function(cb, duration) {
+  g.shapes = g.svg.append("g")
+    .attr("class","shapes")
+    .attr("transform","matrix(1 0 0 -1 0 50)");
+  var rect = g.objects.firstRect = g.shapes.append("rect")
+    .attr("x", 0)
+    .attr("y", 1)
+    .attr("height",g.millionSizeVert)
+    .attr("width",g.millionSizeHoz)
+    .attr("fill","#ECF2F8")
+    .attr("opacity",0)
+    .attr("stroke-width",0);
+  rect.transition()
+      .duration(duration)
+      .attr("opacity",1)
+      .on("end",cb);
+});
+
+var describeOneMillion = PromiseMaker(function(cb, duration) {
+  var coords = svgCoordsToPercentOfViewBox(g.millionSizeHoz+1,g.millionSizeHoz*2);
+  var text = $(document.createElement("div"))
+    .addClass("annotation")
+    .text("🠬 This block represents one million dollars.")
+    .css("left", (coords.x*100) + "%")
+    .css("top", (coords.y*100) + "%");
+  $(sel).find(".animation-inner").append(text);
+  text.hide().fadeIn(duration, cb);
+});
+
+function svgCoordsToPercentOfViewBox(x, y) {
+  var viewBox = g.svg.attr("viewBox").split(" ");
+  var left = (x - viewBox[0])/(viewBox[2]);
+  var bottom = (y - viewBox[1])/(viewBox[3]);
+  return {x:left,y:1-bottom};
+}
+
 /*repeated events*/
 var waitFor = PromiseMaker(function(cb, duration) {
   setTimeout(cb, duration);
@@ -182,7 +236,7 @@ var drawGrid = function(xblocks, yblocks, startx, starty, margin, xsize, ysize) 
 
 var drawInitialLabel = PromiseMaker(function(cb, duration) {
   var label = g.objects.initialLabel = g.svg.append("text");
-  label.text("← This block represents one billion dollars.")
+  label.text("← This block represents one million dollars.")
     .attr("alignment-baseline","hanging")
     .attr("x",1300)
     .attr("y",4200)
@@ -222,19 +276,34 @@ var drawOther64Billion = PromiseMaker(function(cb, duration) {
       .on("end",cb);
 });
 
+var describeIncome = PromiseMaker(function(cb, duration) {
+  var label = g.objects.describe65 = $(document.createElement("div")); 
+  $(sel).find(".animation-inner").append(label);
+  label.text("Assuming a 10% rate of return (the rough average for Berkshire Hathaway stock")
+    .css("left","30%")
+    .css("top","40%")
+    .css("font-size","12pt")
+    .css("color","#ECf2F8")
+    .css("position","absolute")
+    .hide()
+    .fadeIn(duration, cb);
+});
+
 var describe65Billion = PromiseMaker(function(cb, duration) {
-  var label = g.objects.describe65 = g.svg.append("text");
+  var label = g.objects.describe65 = $(document.createElement("div")); 
+  $(sel).find(".animation-inner").append(label);
   label.text("Warren Buffet's net worth is $65 billion.")
-    .attr("alignment-baseline","hanging")
-    .attr("x",3500)
-    .attr("y",2100)
-    .attr("font-size",280)
-    .attr("fill","#ECf2F8")
-    .attr("opacity",0);
-  label.transition()
-      .duration(duration)
-      .attr("opacity",1)
-      .on("end", cb);
+    .css("left","30%")
+    .css("top","40%")
+    .css("font-size","12pt")
+    .css("color","#ECf2F8")
+    .css("position","absolute")
+    .hide()
+    .fadeIn(duration, cb);
+});
+
+var fadeOut65BillionDesc = PromiseMaker(function(cb, duration) {
+  g.objects.describe65.fadeOut(duration, cb);
 });
 
 var annualIncome = PromiseMaker(function(cb, duration) {

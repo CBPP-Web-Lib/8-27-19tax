@@ -32,6 +32,22 @@ $yellow:#FFCE6D;
       width:0px;
     }
   }
+  .annotation {
+    position:absolute;
+    color:#ECF2F8;
+    font-size:12pt;
+  }
+  .animation-wrap, .animation-inner, .animation-inner > svg {
+    overflow:visible;
+  }
+  .animation-outer-wrap {
+    position:relative;
+    padding:20pt;
+    padding-top:0;
+    padding-bottom:0;
+    overflow:hidden;
+
+  }
   .animation-wrap {
     height:0;
     padding-bottom:50%;
