@@ -3,7 +3,7 @@ $yellow:#FFCE6D;
 
 #tanf8-20-19 {
   background-color:#0A5087;
-  width:640px;
+  width:1024px;
   margin-left:auto;
   margin-right:auto;
   margin-top:20px;
@@ -35,7 +35,7 @@ $yellow:#FFCE6D;
   .annotation {
     position:absolute;
     color:#ECF2F8;
-    font-size:12pt;
+    font-size:20pt;
   }
   .animation-wrap, .animation-inner, .animation-inner > svg {
     overflow:visible;
@@ -45,6 +45,7 @@ $yellow:#FFCE6D;
     padding:20pt;
     padding-top:0;
     padding-bottom:0;
+    margin-bottom:50px;
     overflow:hidden;
 
   }

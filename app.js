@@ -33,11 +33,44 @@ function ready() {
   script.before(wrap); 
   wrap.html(g.DOM);
   g.svg = d3.select(".animation-inner").append("svg")
-    .attr("viewBox","0 0 100 50");
+    .attr("viewBox","0 -80 160 80");
 
   waitFor(200)()
-    .then(drawOneMillion(500))
-    .then(describeOneMillion(500));
+    .then(introText(1000))
+    .then(waitFor(4000))
+    .then(fadeOutIntroText(1000))
+    .then(doMultiple([
+      drawOneThousand(1000),
+      describeOneThousand(1000)
+    ]))
+    .then(waitFor(2000))
+    .then(fadeOutOneThousandDescription(500))
+    .then(doMultiple([
+      describeSalary(1000),
+      seriesOfAdditionalBlocks(5000)
+    ]))
+    .then(doMultiple([
+      describeSalaryTax(1000),
+      ordinaryIncomeTaxBlocks(2500)
+    ]))
+    .then(waitFor(1000))
+    .then(doMultiple([
+      fadeOutSalary(500),
+      fadeOutSalaryTax(500)
+    ]))
+    .then(waitFor(1000))
+    .then(zoomToRealizedGainsView(2000))
+    .then(doMultiple([
+      describeCapGains(500),
+      fillOutFirstMillionWithCapGains(2000)
+    ]))
+    .then(fillOutRestOfCapGains(5000))
+    .then(waitFor(2000))
+    .then(doMultiple([
+      describeCapGainsTax(1000),
+      capGainsTax1(1000),
+      capGainsTax2(1000,1000),
+    ]));
 
   /*waitFor(200)()
     .then(drawOneBillion(500))
@@ -127,33 +160,37 @@ var PromiseMaker = function(asyncFunction) {
 g.speedFactor = 1;
 g.subgroupFontSize = 2.5;
 g.objects = {};
-g.shapes = {};
 g.formatters = {};
 g.formatters.percent = function(x, m, round) {
   return (Math.round(x*m*round)/round) + "%";
 };
 
-g.billionSizeHoz = 100;
-g.billionSizeVert = 48;
-g.millionMargin = 1;
-g.billionMargin = 5;
+g.billionSizeHoz = 10000;
+g.billionSizeVert = 4800;
+g.millionMargin = 20;
+g.billionMargin = 500;
 g.millionHoz = 40;
 g.millionVert = 25;
+g.thousandMargin = 1;
+g.thousandHoz = 40;
+g.thousandVert = 25;
 
 g.millionSizeHoz = g.billionSizeHoz / g.millionHoz - g.millionMargin/2 + g.millionMargin/g.millionHoz;
 g.millionSizeVert = g.billionSizeVert / g.millionVert - g.millionMargin/2 + g.millionMargin/g.millionVert;
+g.thousandSizeHoz = g.millionSizeHoz / g.thousandHoz - g.thousandMargin + g.thousandMargin/g.thousandHoz;
+g.thousandSizeVert = g.millionSizeVert / g.thousandVert - g.thousandMargin + g.thousandMargin/g.thousandVert;
 
+console.log(g);
 
-
-var drawOneMillion = PromiseMaker(function(cb, duration) {
+var drawOneThousand = PromiseMaker(function(cb, duration) {
   g.shapes = g.svg.append("g")
     .attr("class","shapes")
-    .attr("transform","matrix(1 0 0 -1 0 50)");
+    .attr("transform","matrix(1 0 0 -1 0 0)");
   var rect = g.objects.firstRect = g.shapes.append("rect")
     .attr("x", 0)
-    .attr("y", 1)
-    .attr("height",g.millionSizeVert)
-    .attr("width",g.millionSizeHoz)
+    .attr("y", 0)
+    .attr("height",g.thousandSizeVert)
+    .attr("width",g.thousandSizeHoz)
     .attr("fill","#ECF2F8")
     .attr("opacity",0)
     .attr("stroke-width",0);
@@ -163,23 +200,343 @@ var drawOneMillion = PromiseMaker(function(cb, duration) {
       .on("end",cb);
 });
 
-var describeOneMillion = PromiseMaker(function(cb, duration) {
-  var coords = svgCoordsToPercentOfViewBox(g.millionSizeHoz+1,g.millionSizeHoz*2);
-  var text = $(document.createElement("div"))
+var introText = PromiseMaker(function(cb, duration) {
+  var text = "Imagine a billionaire founder of a large tech company. He or she might take a token salary of $100,000, but this would only be " +
+    "a very small portion of his or her overall economic income, most of which would be unrealized capital gains.";
+  var div = g.objects.introText = $(document.createElement("div"))
+    .css("width","100%")
+    .css("height","60%")
+    .css("position","absolute")
+    .css("top","40%")
+    .css("left",0)
+    .css("text-align","center")
+    .css("font-size","24pt")
+    .text(text);
+  $(sel).find(".animation-inner").append(div);
+  div.hide().fadeIn(duration, cb);
+});
+
+var fadeOutIntroText = PromiseMaker(function(cb, duration) {
+  g.objects.introText.fadeOut(duration, cb);
+});
+
+var describeOneThousand = PromiseMaker(function(cb, duration) {
+  var coords = svgCoordsToPercentOfViewBox(g.thousandSizeHoz*1.3,g.thousandSizeVert);
+  var text = g.objects.describeOneThousand = $(document.createElement("div"))
     .addClass("annotation")
-    .text("🠬 This block represents one million dollars.")
+    .html("&larr; This block represents one thousand dollars.")
     .css("left", (coords.x*100) + "%")
     .css("top", (coords.y*100) + "%");
   $(sel).find(".animation-inner").append(text);
   text.hide().fadeIn(duration, cb);
 });
 
+var describeSalary = PromiseMaker(function(cb, duration) {
+  var text = "The CEO takes a token salary of $100,000.";
+  var obj = g.objects.salaryDesc = $(document.createElement("div"))
+    .addClass("annotation")
+    .css("right",0)
+    .css("top","20%")
+    .css("width","50%")
+    .css("text-align","center")
+    .text(text);
+  $(sel).find(".animation-inner").append(obj);
+    obj.hide().fadeIn(duration, cb);
+});
+
+var describeSalaryTax = PromiseMaker(function(cb, duration) {
+  var text = "The top individual income tax rate is 37%, plus 7.65% in payroll taxes - a tax bill of about $45,000.";
+  var obj = g.objects.salaryTaxDesc = $(document.createElement("div"))
+    .addClass("annotation")
+    .css("right",0)
+    .css("width","50%")
+    .css("text-align","center")
+    .css("top","50%")
+    .text(text);
+  $(sel).find(".animation-inner").append(obj);
+    obj.hide().fadeIn(duration, cb);
+});
+
+var describeCapGains = PromiseMaker(function(cb, duration) {
+  var text = "To cover the expenses of a luxury lifestyle, the CEO sells stock each year to bring his or her income up to $6 million.";
+  var obj = g.objects.capGainsDesc = $(document.createElement("div"))
+    .addClass("annotation")
+    .css("right",0)
+    .css("width","30%")
+    .css("text-align","center")
+    .css("top","30%")
+    .text(text);
+  $(sel).find(".animation-inner").append(obj);
+    obj.hide().fadeIn(duration, cb);
+});
+
+var describeCapGainsTax = PromiseMaker(function(cb, duration) {
+  var text = "This income is taxed at a preferential rate of 23.8%.";
+  var obj = g.objects.capGainsTaxDesc = $(document.createElement("div"))
+    .addClass("annotation")
+    .css("right",0)
+    .css("width","30%")
+    .css("text-align","center")
+    .css("top","70%")
+    .text(text);
+  $(sel).find(".animation-inner").append(obj);
+    obj.hide().fadeIn(duration, cb);
+});
+
+var fadeOutCapGainsDesc = PromiseMaker(function(cb, duration) {
+  g.objects.capGainsDesc.fadeOut(duration, cb);
+});
+
+var fadeOutCapGainsTaxDesc = PromiseMaker(function(cb, duration) {
+  g.objects.capGainsTaxDesc.fadeOut(duration, cb);
+});
+
 function svgCoordsToPercentOfViewBox(x, y) {
   var viewBox = g.svg.attr("viewBox").split(" ");
   var left = (x - viewBox[0])/(viewBox[2]);
-  var bottom = (y - viewBox[1])/(viewBox[3]);
+  var bottom = (y - viewBox[1])/(viewBox[3])-1;
   return {x:left,y:1-bottom};
 }
+
+var fadeOutOneThousandDescription = PromiseMaker(function(cb, duration) {
+  g.objects.describeOneThousand.fadeOut(duration, cb);
+});
+
+var fadeOutSalaryTax = PromiseMaker(function(cb, duration) {
+  g.objects.salaryTaxDesc.fadeOut(duration, cb);
+});
+
+var fadeOutSalary = PromiseMaker(function(cb, duration) {
+  g.objects.salaryDesc.fadeOut(duration, cb);
+});
+
+var seriesOfAdditionalBlocks = PromiseMaker(function(cb, duration) {
+  fadeInNewBlocks({
+    skipList:{0:{0:true}},
+    duration:duration,
+    width: g.thousandSizeHoz,
+    height: g.thousandSizeVert,
+    margin: g.thousandMargin,
+    xsize:10,
+    ysize:10,
+    transitionAtOnce:25
+  }, cb);
+});
+
+var ordinaryIncomeTaxBlocks = PromiseMaker(function(cb, duration) {
+  fadeInNewBlocks({
+    duration:duration,
+    width: g.thousandSizeHoz,
+    height: g.thousandSizeVert,
+    margin: g.thousandMargin,
+    xsize:10,
+    ysize:5,
+    color:"#5590BF",
+    skipArray:[{rows: 1, cols: 5, rowstart: 4, colstart: 5}],
+    transitionAtOnce:5
+  }, cb);
+});
+
+var zoomToRealizedGainsView = PromiseMaker(function(cb, duration) {
+  g.svg.transition()
+    .duration(duration)
+    .attr("viewBox", "0 -600 1200 600")
+    .on("end", cb);
+});
+
+var fillOutFirstMillionWithCapGains = PromiseMaker(function(cb, duration) {
+  fadeInNewBlocks({
+    duration:duration,
+    width: g.thousandSizeHoz,
+    height: g.thousandSizeVert,
+    margin: g.thousandMargin,
+    xsize:40,
+    ysize:25,
+    skipArray:[{rows: 10, cols: 10, rowstart: 0, colstart: 0}],
+    transitionAtOnce:100
+  }, cb);
+});
+
+var fillOutRestOfCapGains = PromiseMaker(function(cb, duration) {
+  fadeInNewBlocks({
+    duration:duration,
+    xsize:3,
+    ysize:2,
+    skipList:{
+      0:{
+        0:true
+      }
+    },
+    transitionAtOnce:2
+  }, cb);
+});
+
+var capGainsTax1 = PromiseMaker(function(cb, duration) {
+  fadeInNewBlocks({
+    duration:duration,
+    xsize:40,
+    ysize:25,
+    width: g.thousandSizeHoz,
+    height: g.thousandSizeVert,
+    margin: g.thousandMargin,
+    skipArray: [
+      {
+        rows:1,
+        cols:5,
+        rowstart:4,
+        colstart:0
+      },
+      {
+        rows:4,
+        cols:10,
+        rowstart:0,
+        colstart:0
+      }
+    ],
+    color:"#5590BF",
+    transitionAtOnce:100
+  }, cb);
+});
+
+var capGainsTax2 = PromiseMaker(function(cb, duration) {
+  var config = {
+    duration:duration,
+    xsize:40,
+    ysize:12,
+    xstart: g.millionSizeHoz + g.millionMargin,
+    ystart: 0,
+    width: g.thousandSizeHoz,
+    height: g.thousandSizeVert,
+    margin: g.thousandMargin,
+    skipArray: [
+      {
+        rows:1,
+        cols:11,
+        rowstart:11,
+        colstart:29
+      }
+    ],
+    color:"#5590BF",
+    transitionAtOnce:100
+  };
+  fadeInNewBlocks(config, cb);
+});
+
+var fadeInNewBlocks = function(config, cb) {
+
+  var width = config.width || g.millionSizeHoz;
+  var height = config.height || g.millionSizeVert;
+  var margin = config.margin || g.millionMargin;
+  var xsize = config.xsize || g.millionHoz;
+  var ysize = config.ysize || g.millionVert;
+  var xstart = config.xstart || 0;
+  var ystart = config.ystart || 0;
+  var skipList = config.skipList || {};
+  var skipArray = config.skipArray || [];
+  var duration = config.duration || 1000;
+  var transitionAtOnce = config.transitionAtOnce || 10;
+  var verticalOrder = config.verticalOrder || false;
+  var color = config.color || "#ECF2F8";
+  var modSkipList = function(list, confs) {
+    for (var i = 0, ii = confs.length; i<ii; i++) {
+      var conf = confs[i];
+      for (var x = conf.colstart; x<conf.colstart + conf.cols; x++) {
+        for (var y = conf.rowstart; y<conf.rowstart + conf.rows; y++) {
+          list[x] = list[x] || {};
+          list[x][y] = true;
+        }
+      }
+    }
+    return list;
+  };
+
+  skipList = modSkipList(skipList, skipArray);
+  console.log(skipList);
+  var genOrder = function() {
+    var order = [], x, y;
+    if (!verticalOrder) {
+      for (y = 0;y<ysize;y++) {
+        for (x = 0;x<xsize;x++) {
+          add(x, y);
+        }
+      }
+    } else {
+      for (x = 0;x<xsize; x++) {
+        for (y = 0;y<ysize; y++) {
+          add(x, y);
+        }
+      }
+    }
+    function add(x,y) {
+      var good = true;
+      if (skipList[x]) {
+        if (skipList[x][y]) {
+          good = false;
+        }
+      }
+      if (good) {order.push([x,y]);}
+    }
+    return order;
+  };
+
+  var order = genOrder();
+  console.log(order);
+  var n = order.length;
+  var genOpacities = function(n, p, s) {
+    var m = -1/s;
+    var x0 = p*(n+s);
+    var y0 = (0-m)*x0;
+    var r = [];
+    for (var i = 0;i<n;i++) {
+      r.push(Math.max(0,Math.min(1,m*i + y0)));
+    }
+    return r;
+  };
+
+  var blocks;
+
+  var makeBlocks = function() {
+    var id = "c" + xsize + "_" + ysize + "_" + xstart + "_" + ystart + "_" + width + "_" + height + "_" + margin + "_" + color.replace("#","");
+    id = id.replace(/\./g,"d");
+    blocks = g.shapes.selectAll("rect." + id)
+      .data(order)
+      .enter()
+      .append("rect")
+      .attr("class",id)
+      .each(function(d) {
+        var el = d3.select(this);
+        var x = d[0]*(width + margin) + xstart;
+        var y = d[1]*(height + margin) + ystart;
+        el.attr("x",x)
+          .attr("y",y)
+          .attr("width",width)
+          .attr("height",height)
+          .attr("fill",color)
+          .attr("opacity",0);
+    });
+  };
+
+  makeBlocks();
+
+  var frame = function() {
+    var now = Date.now();
+    var progress = (now - startTime)/duration;
+    if (progress > 1) {
+      progress = 1;
+    }
+    var opacities = genOpacities(n, progress, transitionAtOnce);
+    blocks.each(function(d, i) {
+      d3.select(this).attr("opacity",opacities[i]);
+    });
+    if (progress < 1) {
+      window.requestAnimationFrame(frame);
+    } else {
+      cb();
+    }
+  };
+  var startTime = Date.now();
+  frame();
+};
 
 /*repeated events*/
 var waitFor = PromiseMaker(function(cb, duration) {
