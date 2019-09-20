@@ -7,6 +7,7 @@ var csv_parse = require("csv-parse");
 var d3 = require("d3");
 var id = "tanf8-20-19";
 var script = $("#script_" + id);
+var Figure = require("cbpp_figures")($);
 var url_base = script[0].src.replace("js/app.js","").replace("js/app.min.js","");
 var sel = "#" + id;
 require('./app.scss');
@@ -53,66 +54,54 @@ function ready() {
       describeSalaryTax(1000),
       ordinaryIncomeTaxBlocks(2500)
     ]))
-    .then(waitFor(1000))
+    .then(waitFor(3000))
     .then(doMultiple([
       fadeOutSalary(500),
       fadeOutSalaryTax(500)
     ]))
     .then(waitFor(1000))
-    .then(zoomToRealizedGainsView(2000))
     .then(doMultiple([
+      zoomToFirstMillionView(2000),
       describeCapGains(500),
       fillOutFirstMillionWithCapGains(2000)
     ]))
-    .then(fillOutRestOfCapGains(5000))
-    .then(waitFor(2000))
+    .then(labelOneMillion(500))
+    .then(waitFor(1000))
+    .then(doMultiple([
+      zoomToRealizedGainsView(2000),
+      finishCapGainsDesc(500, 2000),
+      fadeOutBracket(500),
+      fillOutRestOfCapGains(4000, 1500),
+      backfillFirstMillion(2000)
+    ]))
+    .then(waitFor(1000))
     .then(doMultiple([
       describeCapGainsTax(1000),
       capGainsTax1(1000),
       capGainsTax2(1000,1000),
-    ]));
+    ]))
+    .then(waitFor(1000))
+    .then(prepareUntaxed(500))
+    .then(waitFor(3000))
+    .then(fadeOutStockSalesExplainer(500))
+    .then(doMultiple([
+      zoomToFurthestOutView(2000),
+      fadeInFirstBillionOfUntaxedIncome(3000)
+    ]))
+    .then(doMultiple([
+      labelOneBillion(500),
+      describeUntaxedIncome(500)
+    ]))
+    .then(waitFor(3000))
+    .then(doMultiple([
+      fadeOutBillionBracket(500),
+      zoomOutEvenFurther(1000),
+      fadeIn3Billion(3000),
+      describeUntaxedIncome2(1000)
+    ]))
+    .then(describeUntaxedIncome3(1000));
 
-  /*waitFor(200)()
-    .then(drawOneBillion(500))
-    .then(drawInitialLabel(500))
-    .then(waitFor(1000))
-    .then(fadeOutInitialLabel(500))
-    .then(doMultiple([
-      drawOther64Billion(500),
-      describe65Billion(500)
-    ]))
-    .then(annualIncome(2500))
-    .then(doMultiple([
-      zoomIn(2500),
-      divBlocks(2495, 5),
-      moveGroups(2500),
-      fadeOut65BillionDesc(1000)
-    ]))
-    .then(highlightAGI(2500))
-    .then(zoomInMore(2500))
-    .then(highlightTax(2500))
-    .then(waitFor(1000))
-    .then(doMultiple([
-      zoomIn(5000)
-    ]))
-    .then(doMultiple([
-      zoomBackOut(2000),
-      moveGroupsBack(2000),
-      removeMillionLines(2000)
-    ]));*/
-   // .then(drawInitialLine(500))
-    //.then(drawFirstBar(500))
-   // .then(writeFirstLabel(500))
-    //.then(waitFor(2000))
-    //.then(drawSecondBar(1500))
-    //.then(writeSecondLabel(500))
-   // .then(waitFor(9000))
-   // .then(fadeOut(500));
-    /*.then(doMultiple([
-      sliceRect1(1000),
-      drawTopOneLabel(1000)
-    ]))*/
-    
+ 
 }
 
 var colors = { 
@@ -165,8 +154,8 @@ g.formatters.percent = function(x, m, round) {
   return (Math.round(x*m*round)/round) + "%";
 };
 
-g.billionSizeHoz = 10000;
-g.billionSizeVert = 4800;
+g.billionSizeHoz = 9500;
+g.billionSizeVert = 4700;
 g.millionMargin = 20;
 g.billionMargin = 500;
 g.millionHoz = 40;
@@ -175,8 +164,8 @@ g.thousandMargin = 1;
 g.thousandHoz = 40;
 g.thousandVert = 25;
 
-g.millionSizeHoz = g.billionSizeHoz / g.millionHoz - g.millionMargin/2 + g.millionMargin/g.millionHoz;
-g.millionSizeVert = g.billionSizeVert / g.millionVert - g.millionMargin/2 + g.millionMargin/g.millionVert;
+g.millionSizeHoz = g.billionSizeHoz / g.millionHoz - g.millionMargin + g.millionMargin/g.millionHoz;
+g.millionSizeVert = g.billionSizeVert / g.millionVert - g.millionMargin + g.millionMargin/g.millionVert;
 g.thousandSizeHoz = g.millionSizeHoz / g.thousandHoz - g.thousandMargin + g.thousandMargin/g.thousandHoz;
 g.thousandSizeVert = g.millionSizeVert / g.thousandVert - g.thousandMargin + g.thousandMargin/g.thousandVert;
 
@@ -258,11 +247,180 @@ var describeSalaryTax = PromiseMaker(function(cb, duration) {
 });
 
 var describeCapGains = PromiseMaker(function(cb, duration) {
-  var text = "To cover the expenses of a luxury lifestyle, the CEO sells stock each year to bring his or her income up to $6 million.";
+  var text = "To cover the expenses of a luxury lifestyle, the billionaire sells stock each year...";
   var obj = g.objects.capGainsDesc = $(document.createElement("div"))
     .addClass("annotation")
     .css("right",0)
     .css("width","30%")
+    .css("text-align","center")
+    .css("top","10%")
+    .text(text);
+  $(sel).find(".animation-inner").append(obj);
+    obj.hide().fadeIn(duration, cb);
+});
+
+var backfillFirstMillion = PromiseMaker(function(cb, duration) {
+  fadeInNewBlocks({
+    duration:duration,
+    width: g.millionSizeHoz,
+    height: g.millionSizeVert,
+    margin: g.millionMargin,
+    xsize:1,
+    ysize:1,
+    transitionAtOnce:1,
+    color:"#ECF2F8",
+    prepend:true
+  }, cb);
+});
+
+var finishCapGainsDesc = PromiseMaker(function(cb, duration) {
+  var text = "...up to $6 million.";
+  var obj = g.objects.capGainsDesc2 = $(document.createElement("div"))
+    .addClass("annotation")
+    .css("right",0)
+    .css("width","30%")
+    .css("text-align","center")
+    .css("top","40%")
+    .text(text);
+  $(sel).find(".animation-inner").append(obj);
+    obj.hide().fadeIn(duration, cb);
+});
+
+var labelOneMillion = PromiseMaker(function(cb, duration) {
+  var outer_wrap = g.objects.oneMillionLabel = $(document.createElement("div"));
+  outer_wrap.css({
+    left:"56%",
+    top:"0%",
+    width:"20%",
+    height:"100%",
+    display:"block"
+  }).addClass("annotation");
+  var inner_wrap = $(document.createElement("div"));
+  inner_wrap.css({
+    "white-space":"nowrap",
+    height:"100%"
+  });
+  var bracket = $(document.createElement("div"));
+  bracket.css({
+    display:"inline-block",
+    "font-size":"100pt",
+    "font-family":"Bravura",
+    transform:"scaleY(2.5)",
+    position:"relative",
+    top:"120pt"
+  }).html("");
+  var text = $(document.createElement("div"));
+  text.css({
+    display:"inline-block",
+    "font-size":"20pt",
+    top:"2pt",
+    left:"4pt",
+    position:"relative"
+  }).text("one million dollars");
+  outer_wrap.append(inner_wrap);
+  inner_wrap.append(bracket, text);
+  $(sel).find(".animation-inner").append(outer_wrap);
+  outer_wrap.hide().fadeIn(duration, cb);
+    
+});
+
+var labelOneBillion = PromiseMaker(function(cb, duration) {
+  var outer_wrap = g.objects.oneBillionLabel = $(document.createElement("div"));
+  outer_wrap.css({
+    left:"55%",
+    top:"5%",
+    width:"20%",
+    height:"100%",
+    display:"block"
+  }).addClass("annotation");
+  var inner_wrap = $(document.createElement("div"));
+  inner_wrap.css({
+    "white-space":"nowrap",
+    height:"100%"
+  });
+  var bracket = $(document.createElement("div"));
+  bracket.css({
+    display:"inline-block",
+    "font-size":"100pt",
+    "font-family":"Bravura",
+    transform:"scaleY(1.5)",
+    position:"relative",
+    top:"120pt"
+  }).html("");
+  var text = $(document.createElement("div"));
+  text.css({
+    display:"inline-block",
+    "font-size":"20pt",
+    top:"50pt",
+    left:"4pt",
+    position:"relative"
+  }).text("one billion dollars");
+  outer_wrap.append(inner_wrap);
+  inner_wrap.append(bracket, text);
+  $(sel).find(".animation-inner").append(outer_wrap);
+  outer_wrap.hide().fadeIn(duration, cb);
+    
+});
+
+var fadeOutBracket = PromiseMaker(function(cb, duration) {
+  g.objects.oneMillionLabel.fadeOut(duration, cb);
+});
+
+var describeCapGainsTax = PromiseMaker(function(cb, duration) {
+  var text = "Income from these stock sales is taxed at a preferential rate of 23.8%.";
+  var obj = g.objects.capGainsTaxDesc = $(document.createElement("div"))
+    .addClass("annotation")
+    .css("right",0)
+    .css("width","30%")
+    .css("text-align","center")
+    .css("top","50%")
+    .text(text);
+  $(sel).find(".animation-inner").append(obj);
+    obj.hide().fadeIn(duration, cb);
+});
+
+var prepareUntaxed = PromiseMaker(function(cb, duration) {
+  var text = "But this is still only a very small portion of his or her economic income.";
+  var obj = g.objects.untaxedPrep = $(document.createElement("div"))
+  .addClass("annotation")
+  .css("right",0)
+  .css("width","30%")
+  .css("text-align","center")
+  .css("top","80%")
+  .text(text);
+  $(sel).find(".animation-inner").append(obj);
+  obj.hide().fadeIn(duration, cb);
+});
+
+
+
+
+var fadeOutStockSalesExplainer = PromiseMaker(function(cb, duration) {
+  g.objects.capGainsDesc.fadeOut(duration, cb);
+  g.objects.capGainsTaxDesc.fadeOut(duration);
+  g.objects.untaxedPrep.fadeOut(duration);
+  g.objects.capGainsDesc2.fadeOut(duration);
+});
+
+var describeUntaxedIncome = PromiseMaker(function(cb, duration) {
+  var text = "Individuals who own large amounts of stock might see annual changes in the value of their portfolios of $1 billion...";
+  var obj = g.objects.untaxedGains= $(document.createElement("div"))
+    .addClass("annotation")
+    .css("right",0)
+    .css("width","50%")
+    .css("text-align","center")
+    .css("top","5%")
+    .text(text);
+  $(sel).find(".animation-inner").append(obj);
+    obj.hide().fadeIn(duration, cb);
+});
+
+var describeUntaxedIncome2 = PromiseMaker(function(cb, duration) {
+  var text = "...or even $2 or $3 billion.";
+  var obj = g.objects.untaxedGainsFinal = $(document.createElement("div"))
+    .addClass("annotation")
+    .css("right",0)
+    .css("width","50%")
     .css("text-align","center")
     .css("top","30%")
     .text(text);
@@ -270,25 +428,36 @@ var describeCapGains = PromiseMaker(function(cb, duration) {
     obj.hide().fadeIn(duration, cb);
 });
 
-var describeCapGainsTax = PromiseMaker(function(cb, duration) {
-  var text = "This income is taxed at a preferential rate of 23.8%.";
-  var obj = g.objects.capGainsTaxDesc = $(document.createElement("div"))
+var describeUntaxedIncome3 = PromiseMaker(function(cb, duration) {
+  var text = "None of this income is taxable if the stock is never sold. These assets can be passed onto heirs, ensuring that tax will NEVER be paid on such gains.";
+  var obj = g.objects.untaxedGainsFinal2 = $(document.createElement("div"))
     .addClass("annotation")
     .css("right",0)
-    .css("width","30%")
+    .css("width","50%")
     .css("text-align","center")
-    .css("top","70%")
+    .css("top","55%")
     .text(text);
   $(sel).find(".animation-inner").append(obj);
     obj.hide().fadeIn(duration, cb);
+  
 });
 
-var fadeOutCapGainsDesc = PromiseMaker(function(cb, duration) {
-  g.objects.capGainsDesc.fadeOut(duration, cb);
+var fadeOutBillionBracket = PromiseMaker(function(cb, duration) {
+  g.objects.oneBillionLabel.fadeOut(duration, cb);
 });
 
-var fadeOutCapGainsTaxDesc = PromiseMaker(function(cb, duration) {
-  g.objects.capGainsTaxDesc.fadeOut(duration, cb);
+var fadeIn3Billion = PromiseMaker(function(cb, duration) {
+  fadeInNewBlocks({
+    skipList:{0:{0:true}},
+    duration:duration,
+    width: g.billionSizeHoz,
+    height: g.billionSizeVert,
+    margin: g.billionMargin,
+    xsize:1,
+    ysize:3,
+    transitionAtOnce:1,
+    color:"#aaaaaa"
+  }, cb);
 });
 
 function svgCoordsToPercentOfViewBox(x, y) {
@@ -337,12 +506,35 @@ var ordinaryIncomeTaxBlocks = PromiseMaker(function(cb, duration) {
   }, cb);
 });
 
+var zoomToFirstMillionView = PromiseMaker(function(cb, duration) {
+  g.svg.transition()
+    .duration(duration)
+    .attr("viewBox", "0 -200 400 200")
+    .on("end", cb);
+});
+
 var zoomToRealizedGainsView = PromiseMaker(function(cb, duration) {
   g.svg.transition()
     .duration(duration)
     .attr("viewBox", "0 -600 1200 600")
     .on("end", cb);
 });
+
+var zoomToFurthestOutView = PromiseMaker(function(cb, duration) {
+  g.svg.transition()
+    .duration(duration)
+    .attr("viewBox", "0 -9000 18000 9000")
+    .on("end", cb);
+});
+
+
+var zoomOutEvenFurther = PromiseMaker(function(cb, duration) {
+  g.svg.transition()
+    .duration(duration)
+    .attr("viewBox", "0 -16000 32000 16000")
+    .on("end", cb);
+});
+
 
 var fillOutFirstMillionWithCapGains = PromiseMaker(function(cb, duration) {
   fadeInNewBlocks({
@@ -352,10 +544,13 @@ var fillOutFirstMillionWithCapGains = PromiseMaker(function(cb, duration) {
     margin: g.thousandMargin,
     xsize:40,
     ysize:25,
+    verticalOrder:true,
     skipArray:[{rows: 10, cols: 10, rowstart: 0, colstart: 0}],
     transitionAtOnce:100
   }, cb);
 });
+
+
 
 var fillOutRestOfCapGains = PromiseMaker(function(cb, duration) {
   fadeInNewBlocks({
@@ -422,6 +617,31 @@ var capGainsTax2 = PromiseMaker(function(cb, duration) {
   fadeInNewBlocks(config, cb);
 });
 
+var fadeInFirstBillionOfUntaxedIncome = PromiseMaker(function(cb, duration) {
+  var config = {
+    duration:duration,
+    xsize:40,
+    ysize:25,
+    xstart:0,
+    ystart:0,
+    width: g.millionSizeHoz,
+    height: g.millionSizeVert,
+    margin: g.millionMargin,
+    verticalOrder: true,
+    skipArray: [
+      {
+        rows:2,
+        cols:3,
+        rowstart:0,
+        colstart:0
+      }
+    ],
+    color:"#aaaaaa",
+    transitionAtOnce:10
+  };
+  fadeInNewBlocks(config, cb);
+});
+
 var fadeInNewBlocks = function(config, cb) {
 
   var width = config.width || g.millionSizeHoz;
@@ -437,6 +657,7 @@ var fadeInNewBlocks = function(config, cb) {
   var transitionAtOnce = config.transitionAtOnce || 10;
   var verticalOrder = config.verticalOrder || false;
   var color = config.color || "#ECF2F8";
+
   var modSkipList = function(list, confs) {
     for (var i = 0, ii = confs.length; i<ii; i++) {
       var conf = confs[i];
@@ -514,6 +735,9 @@ var fadeInNewBlocks = function(config, cb) {
           .attr("fill",color)
           .attr("opacity",0);
     });
+    if (config.prepend===true) {
+      blocks.lower();
+    }
   };
 
   makeBlocks();
