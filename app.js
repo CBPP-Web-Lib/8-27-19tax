@@ -10,6 +10,9 @@ var script = $("#script_" + id);
 var Figure = require("cbpp_figures")($);
 var url_base = script[0].src.replace("js/app.js","").replace("js/app.min.js","");
 var sel = "#" + id;
+var colorgen = require("cbpp_colorgen");
+var colors = colorgen("#D6E4F0","#5590BF",3);
+console.log(colors);
 require('./app.scss');
 var g = {};
 g.DOM = require("./DOM.html");
@@ -86,6 +89,7 @@ function ready() {
     .then(fadeOutStockSalesExplainer(500))
     .then(doMultiple([
       zoomToFurthestOutView(2000),
+      solidifyTax(1000),
       fadeInFirstBillionOfUntaxedIncome(3000)
     ]))
     .then(doMultiple([
@@ -99,18 +103,11 @@ function ready() {
       fadeIn3Billion(3000),
       describeUntaxedIncome2(1000)
     ]))
-    .then(describeUntaxedIncome3(1000));
+    .then(describeUntaxedIncome3(1000))
+    .then(moveStuffAtEnd(500000));
 
- 
+
 }
-
-var colors = { 
-  blue100: "#0C61A4", 
-  blue70: "#5590BF",
-  blue17: "#D6E4F0",
-  blue8: "#ECF2F8",
-  share100: "#0A5087"
-};
 
 var doMultiple = function(arr) {
   return function() {
@@ -146,7 +143,7 @@ var PromiseMaker = function(asyncFunction) {
     };
   };
 };
-g.speedFactor = 1;
+g.speedFactor = 10;
 g.subgroupFontSize = 2.5;
 g.objects = {};
 g.formatters = {};
@@ -175,18 +172,19 @@ var drawOneThousand = PromiseMaker(function(cb, duration) {
   g.shapes = g.svg.append("g")
     .attr("class","shapes")
     .attr("transform","matrix(1 0 0 -1 0 0)");
-  var rect = g.objects.firstRect = g.shapes.append("rect")
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("height",g.thousandSizeVert)
-    .attr("width",g.thousandSizeHoz)
-    .attr("fill","#ECF2F8")
-    .attr("opacity",0)
-    .attr("stroke-width",0);
-  rect.transition()
-      .duration(duration)
-      .attr("opacity",1)
-      .on("end",cb);
+  fadeInNewBlocks({
+    duration:duration,
+    xsize:1,
+    ysize:1,
+    xstart: 0,
+    ystart: 0,
+    width: g.thousandSizeHoz,
+    height: g.thousandSizeVert,
+    margin: g.thousandMargin,
+    identifier:"firstThousand",
+    color:colors[0],
+    transitionAtOnce:1
+  }, cb);
 });
 
 var introText = PromiseMaker(function(cb, duration) {
@@ -265,10 +263,11 @@ var backfillFirstMillion = PromiseMaker(function(cb, duration) {
     width: g.millionSizeHoz,
     height: g.millionSizeVert,
     margin: g.millionMargin,
+    identifier: "firstMillion",
     xsize:1,
     ysize:1,
     transitionAtOnce:1,
-    color:"#ECF2F8",
+    color:colors[1],
     prepend:true
   }, cb);
 });
@@ -450,6 +449,7 @@ var fadeIn3Billion = PromiseMaker(function(cb, duration) {
   fadeInNewBlocks({
     skipList:{0:{0:true}},
     duration:duration,
+    identifier:"threeBillion",
     width: g.billionSizeHoz,
     height: g.billionSizeVert,
     margin: g.billionMargin,
@@ -488,7 +488,8 @@ var seriesOfAdditionalBlocks = PromiseMaker(function(cb, duration) {
     margin: g.thousandMargin,
     xsize:10,
     ysize:10,
-    transitionAtOnce:25
+    transitionAtOnce:25,
+    identifier:"restOfSalary"
   }, cb);
 });
 
@@ -500,7 +501,8 @@ var ordinaryIncomeTaxBlocks = PromiseMaker(function(cb, duration) {
     margin: g.thousandMargin,
     xsize:10,
     ysize:5,
-    color:"#5590BF",
+    color:"#C75459",
+    identifier:"ordinaryTax",
     skipArray:[{rows: 1, cols: 5, rowstart: 4, colstart: 5}],
     transitionAtOnce:5
   }, cb);
@@ -543,20 +545,47 @@ var fillOutFirstMillionWithCapGains = PromiseMaker(function(cb, duration) {
     height: g.thousandSizeVert,
     margin: g.thousandMargin,
     xsize:40,
+    color:colors[1],
     ysize:25,
     verticalOrder:true,
+    identifier:"firstMillionOfCapGains",
     skipArray:[{rows: 10, cols: 10, rowstart: 0, colstart: 0}],
     transitionAtOnce:100
   }, cb);
 });
 
-
+var moveStuffAtEnd = PromiseMaker(function(cb, duration) {
+  var starts1 = [];
+  g.svg.selectAll("[data-identifier='restOfCapGains'], [data-identifier='firstMillion']")
+    .transition(duration)
+    .attr("x",function(d, i) {
+      starts1[i] = starts1[i] || d3.select(this).attr("x")*1;
+      var r = starts1[i] + g.billionSizeHoz + g.billionMargin;
+      console.log(r);
+      return r;
+    });
+  var starts2 = [];
+  g.svg.selectAll("[data-identifier='restOfSalary'], [data-identifier='firstThousand'], [data-identifier='firstMillionOfCapGains']")
+    .attr("opacity",0);
+  console.log(g.svg.selectAll("[data-identifier='restOfCapGains'], [data-identifier='firstMillionOfCapGains']"));
+  g.svg.selectAll("[data-identifier='capGainsTax1'], [data-identifier='capGainsTax2'], [data-identifier='ordinaryTax']")
+    .transition(duration)
+    .attr("x", function(d, i) {
+      starts2[i] = starts2[i] || d3.select(this).attr("x")*1;
+      var r = starts2[i] + g.billionSizeHoz + g.billionMargin + 6*g.millionSizeHoz;
+      console.log(r);
+      return r;
+    })
+    .on("end", cb);
+});
 
 var fillOutRestOfCapGains = PromiseMaker(function(cb, duration) {
   fadeInNewBlocks({
     duration:duration,
     xsize:3,
     ysize:2,
+    color:colors[1],
+    identifier:"restOfCapGains",
     skipList:{
       0:{
         0:true
@@ -574,21 +603,16 @@ var capGainsTax1 = PromiseMaker(function(cb, duration) {
     width: g.thousandSizeHoz,
     height: g.thousandSizeVert,
     margin: g.thousandMargin,
+    identifier:"capGainsTax1",
     skipArray: [
       {
-        rows:1,
-        cols:5,
-        rowstart:4,
-        colstart:0
-      },
-      {
-        rows:4,
+        rows:10,
         cols:10,
         rowstart:0,
         colstart:0
       }
     ],
-    color:"#5590BF",
+    color:"#C75459",
     transitionAtOnce:100
   }, cb);
 });
@@ -597,21 +621,22 @@ var capGainsTax2 = PromiseMaker(function(cb, duration) {
   var config = {
     duration:duration,
     xsize:40,
-    ysize:12,
+    ysize:13,
     xstart: g.millionSizeHoz + g.millionMargin,
     ystart: 0,
     width: g.thousandSizeHoz,
     height: g.thousandSizeVert,
     margin: g.thousandMargin,
+    identifier:"capGainsTax2",
     skipArray: [
       {
         rows:1,
-        cols:11,
-        rowstart:11,
-        colstart:29
+        cols:16,
+        rowstart:12,
+        colstart:24
       }
     ],
-    color:"#5590BF",
+    color:"#C75459",
     transitionAtOnce:100
   };
   fadeInNewBlocks(config, cb);
@@ -628,6 +653,7 @@ var fadeInFirstBillionOfUntaxedIncome = PromiseMaker(function(cb, duration) {
     height: g.millionSizeVert,
     margin: g.millionMargin,
     verticalOrder: true,
+    identifier:"firstBillionUntaxed",
     skipArray: [
       {
         rows:2,
@@ -640,6 +666,32 @@ var fadeInFirstBillionOfUntaxedIncome = PromiseMaker(function(cb, duration) {
     transitionAtOnce:10
   };
   fadeInNewBlocks(config, cb);
+});
+
+var solidifyTax = PromiseMaker(function(cb, duration) {
+  var identifiers = [
+    "restOfSalary",
+    "capGainsTax1",
+    "capGainsTax2",
+    "ordinaryTax",
+    "firstThousand"
+  ];
+  var selector = [];
+  identifiers.forEach(function(el) {
+    selector.push("[data-identifier='" + el + "']");
+  });
+  selector = selector.join(",");
+  var gridTax = g.svg.selectAll(selector).filter(function() {
+    return d3.select(this).attr("data-gridless")===true;
+  });
+  var gridlessTax = g.svg.selectAll(selector).filter("[data-gridless]");
+  gridlessTax.transition()
+    .duration(duration)
+    .attr("opacity",1)
+    .on("end", cb);
+  gridTax.transition()
+    .duration(duration)
+    .attr("opacity",0);
 });
 
 var fadeInNewBlocks = function(config, cb) {
@@ -656,8 +708,8 @@ var fadeInNewBlocks = function(config, cb) {
   var duration = config.duration || 1000;
   var transitionAtOnce = config.transitionAtOnce || 10;
   var verticalOrder = config.verticalOrder || false;
-  var color = config.color || "#ECF2F8";
-
+  var color = config.color || colors[0];
+  var identifier = config.identifier;
   var modSkipList = function(list, confs) {
     for (var i = 0, ii = confs.length; i<ii; i++) {
       var conf = confs[i];
@@ -672,7 +724,6 @@ var fadeInNewBlocks = function(config, cb) {
   };
 
   skipList = modSkipList(skipList, skipArray);
-  console.log(skipList);
   var genOrder = function() {
     var order = [], x, y;
     if (!verticalOrder) {
@@ -701,7 +752,6 @@ var fadeInNewBlocks = function(config, cb) {
   };
 
   var order = genOrder();
-  console.log(order);
   var n = order.length;
   var genOpacities = function(n, p, s) {
     var m = -1/s;
@@ -714,7 +764,7 @@ var fadeInNewBlocks = function(config, cb) {
     return r;
   };
 
-  var blocks;
+  var blocks, gridlessBlocks;
 
   var makeBlocks = function() {
     var id = "c" + xsize + "_" + ysize + "_" + xstart + "_" + ystart + "_" + width + "_" + height + "_" + margin + "_" + color.replace("#","");
@@ -732,6 +782,29 @@ var fadeInNewBlocks = function(config, cb) {
           .attr("y",y)
           .attr("width",width)
           .attr("height",height)
+          .attr("data-identifier", function() {
+            if (identifier) {return identifier;}
+          })
+          .attr("fill",color)
+          .attr("opacity",0);
+    });
+    gridlessBlocks = g.shapes.selectAll("rect." + id + "_gridless")
+      .data(order)
+      .enter()
+      .append("rect")
+      .attr("class",id)
+      .each(function(d) {
+        var el = d3.select(this);
+        var x = d[0]*(width + margin) + xstart;
+        var y = d[1]*(height + margin) + ystart;
+        el.attr("x",x-margin*0.05)
+          .attr("y",y-margin*0.05)
+          .attr("data-identifier", function() {
+            if (identifier) {return identifier;}
+          })
+          .attr("data-gridless",true)
+          .attr("width",width + margin*1.1)
+          .attr("height",height + margin*1.1)
           .attr("fill",color)
           .attr("opacity",0);
     });
@@ -755,7 +828,7 @@ var fadeInNewBlocks = function(config, cb) {
     if (progress < 1) {
       window.requestAnimationFrame(frame);
     } else {
-      cb();
+      cb(blocks, gridlessBlocks);
     }
   };
   var startTime = Date.now();
@@ -765,327 +838,4 @@ var fadeInNewBlocks = function(config, cb) {
 /*repeated events*/
 var waitFor = PromiseMaker(function(cb, duration) {
   setTimeout(cb, duration);
-});
-
-/*one-off events*/
-var drawOneBillion = PromiseMaker(function(cb, duration) {
-  g.shapes = g.svg.append("g")
-    .attr("class","shapes");
-  var rect = g.objects.firstRect = g.shapes.append("rect")
-    .attr("x", 1000)
-    .attr("y", 4200)
-    .attr("height",240)
-    .attr("width",240)
-    .attr("fill","#ECF2F8")
-    .attr("opacity",0)
-    .attr("stroke-width",0);
-  rect.transition()
-      .duration(duration)
-      .attr("opacity",1)
-      .on("end",cb);
-});
-
-var drawGrid = function(xblocks, yblocks, startx, starty, margin, xsize, ysize) {
-  var data = [];
-  if (typeof(margin)==="undefined") {
-    margin = 60;
-  }
-  if (typeof(xsize)==="undefined") {
-    xsize = 240;
-  }
-  if (typeof(ysize)==="undefined") {
-    ysize = 240;
-  }
-  var className = "grid" + xblocks + "-" + yblocks + "-" + startx + "-" + starty;
-  for (var x = 0; x<xblocks; x++) {
-    for (var y = 0; y<yblocks; y++) {
-      data.push([x,y]);
-    }
-  }
-  className = className.replace(/\./g,"p");
-  var rects = g.shapes.selectAll("rect." + className)
-    .data(data)
-    .enter()
-    .append("rect")
-      .attr("class",className)
-      .attr("x", function(d) {return startx + d[0]*(xsize + margin);})
-      .attr("y", function(d) {return starty + d[1]*(ysize + margin);})
-      .attr("width", xsize)
-      .attr("height", ysize);
-  return rects;
-};
-
-var drawInitialLabel = PromiseMaker(function(cb, duration) {
-  var label = g.objects.initialLabel = g.svg.append("text");
-  label.text("← This block represents one million dollars.")
-    .attr("alignment-baseline","hanging")
-    .attr("x",1300)
-    .attr("y",4200)
-    .attr("font-size",280)
-    .attr("fill","#ECf2F8")
-    .attr("opacity",0);
-  label.transition()
-      .duration(duration)
-      .attr("opacity",1)
-      .on("end", cb);
-});
-
-var fadeOutInitialLabel = PromiseMaker(function(cb, duration) {
-  var label = g.objects.initialLabel;
-  label.attr("opacity",1)
-    .transition()
-    .duration(duration)
-    .attr("opacity",0)
-    .on("end", function() {
-      label.remove();
-      cb();
-    });
-});
-
-var drawOther64Billion = PromiseMaker(function(cb, duration) {
-  var finishedRow = drawGrid(4, 1, 1300, 4200);
-  var restOfGrid = drawGrid(5,12,1000,600);
-  var boxes = g.objects.other64Boxes = d3.selectAll(finishedRow.nodes().concat(restOfGrid.nodes()))
-    .attr("opacity",0)
-    .attr("fill","#ECF2F8")
-    .attr("class", function() {
-      return (d3.select(this).attr("class") + " billionBox").trim();
-    });
-  boxes.transition()
-      .duration(duration)
-      .attr("opacity",1)
-      .on("end",cb);
-});
-
-var describeIncome = PromiseMaker(function(cb, duration) {
-  var label = g.objects.describe65 = $(document.createElement("div")); 
-  $(sel).find(".animation-inner").append(label);
-  label.text("Assuming a 10% rate of return (the rough average for Berkshire Hathaway stock")
-    .css("left","30%")
-    .css("top","40%")
-    .css("font-size","12pt")
-    .css("color","#ECf2F8")
-    .css("position","absolute")
-    .hide()
-    .fadeIn(duration, cb);
-});
-
-var describe65Billion = PromiseMaker(function(cb, duration) {
-  var label = g.objects.describe65 = $(document.createElement("div")); 
-  $(sel).find(".animation-inner").append(label);
-  label.text("Warren Buffet's net worth is $65 billion.")
-    .css("left","30%")
-    .css("top","40%")
-    .css("font-size","12pt")
-    .css("color","#ECf2F8")
-    .css("position","absolute")
-    .hide()
-    .fadeIn(duration, cb);
-});
-
-var fadeOut65BillionDesc = PromiseMaker(function(cb, duration) {
-  g.objects.describe65.fadeOut(duration, cb);
-});
-
-var annualIncome = PromiseMaker(function(cb, duration) {
-  var w = 3;
-  var h = 2;
-  var n = w*h;
-  var newBoxes = g.objects.annualIncome = drawGrid(w,h,2500,3900);
-  var nodes = [];
-  newBoxes.attr("opacity",0);
-  newBoxes.attr("fill","#ECF2F8");
-  newBoxes.each(function(d) {
-    nodes.push([d, this]);
-  });
-  nodes.sort(function(a, b) {
-    var d1 = a[0];
-    var d2 = b[0];
-    return -d1[1]*1000 + d1[0] - (-d2[1]*1000 + d2[0]);
-  });
-  nodes.forEach(function(el, i) {
-    el = el[1];
-    d3.select(el).attr("class", (d3.select(el).attr("class") + " income-block billionBox").trim());
-    setTimeout(function() {
-      d3.select(el).transition()
-      .duration(duration/n)
-      .attr("opacity",1)
-      .on("end", function() {
-        if (i===n-1) {
-          cb();
-        }
-      });
-    }, i/n * duration);
-  });
-});
-
-var zoomIn = PromiseMaker(function(cb, duration) {
-  g.svg.transition()
-    .duration(duration)
-    .attr("viewBox","2440 3945 1250 450")
-    .on("end", cb);
-});
-
-var divBlocks = PromiseMaker(function(cb, duration) {
-  g.millionLines = g.svg.append("g")
-    .attr("class", "millionLines");
-  
-    var xchange = 55;
-    var ychange = 55;
-  g.svg.selectAll(".income-block").each(function(d, i) {
-    var el = d3.select(this);
-    var width = el.attr("data-orgwidth")*1+xchange;
-    var height = el.attr("data-orgheight")*1+ychange;
-    var xc = el.attr("data-orgx");
-    var yc = el.attr("data-orgy");
-    var group = g.millionLines.append("g")
-      .attr("class", el.attr("class").replace("income-block","income-block-group"))
-      .attr("transform","translate(" + (xc-xchange/2) + "," + (yc-ychange/2) + ")");
-    var xlines = 40;
-    var ylines = 25;
-    for (var x = 1; x<xlines;x++) {
-      var xpos = x/xlines*width;
-      group.append("line")
-        .attr("stroke-width",2)
-        .attr("stroke","#0A5087")
-        .attr("x1",xpos)
-        .attr("y1",0)
-        .attr("x2",xpos)
-        .attr("y2",height)
-        .attr("opacity",0)
-        .attr("class","millionLine millionLineHoz");
-    }
-    for (var y = 1; y<=ylines;y++) {
-      var ypos = y/ylines*height;
-      group.append("line")
-        .attr("stroke-width",2)
-        .attr("stroke","#0A5087")
-        .attr("x1",0)
-        .attr("y1",ypos)
-        .attr("x2",width)
-        .attr("y2",ypos)
-        .attr("opacity",0)
-        .attr("class","millionLine millionLineVert");
-    }
-    group.selectAll(".millionLine")
-      .transition()
-      .duration(duration)
-      .attr("opacity",1)
-      .on("end",cb);
-  });
-});
-
-var moveGroups = PromiseMaker(function(cb, duration) {
-  g.svg.selectAll(".billionBox").each(function() {
-    var self = d3.select(this);
-    var startx = self.attr("x");
-    var starty = self.attr("y");
-    self.attr("data-orgx",startx);
-    self.attr("data-orgy",starty);
-    self.attr("data-orgwidth",self.attr("width"));
-    self.attr("data-orgheight",self.attr("height"));
-    self.transition()
-      .duration(duration)
-      .attr("width",295)
-      .attr("height",295)
-      .attr("x",startx - 55/2)
-      .attr("y", starty - 55/2)
-      .on("end", cb);
-  });
-});
-
-var highlightAGI = PromiseMaker(function(cb, duration) {
-  var ysize = 11.6;
-  var xsize = 7.175;
-  var margin = 0.2;
-  var xbottom = 3367.5;
-  var yright = 4467.5; 
-  var rects = drawGrid(3,3,xbottom-3*(xsize+margin)+margin/2, yright - 3*(ysize+margin)+margin/2, margin, xsize, ysize);
-  var rects2 = drawGrid(2,1,xbottom-2*(xsize+margin)+margin/2, yright - 4*(ysize+margin)+margin/2, margin, xsize, ysize);
-  var halfRect = drawGrid(1,1,xbottom-3*(xsize+margin)+margin/2, yright - 4*(ysize+margin)+margin/2 + 0.4*ysize, margin, xsize, ysize*0.6);
-  g.AGIRects = d3.selectAll(rects.nodes().concat(rects2.nodes()).concat(halfRect.nodes()));
-  g.svg.selectAll(".income-block")
-    .transition()
-    .duration(duration)
-    .attr("opacity",0.3)
-    .on("end",cb);
-  g.AGIRects.attr("fill","#ECF2F8")
-    .attr("class","highlighted");
-  /*3180 4400 100 50*/
-});
-
-var zoomInMore = PromiseMaker(function(cb, duration) {
-  g.svg.transition()
-    .duration(duration)
-    .attr("viewBox","3320 4418 100 50")
-    .on("end",cb);
-  g.svg.selectAll(".millionLine")
-    .transition()
-    .duration(duration)
-    .attr("stroke-width",0.2);
-
-});
-
-var highlightTax = PromiseMaker(function(cb, duration) {
-  var ysize = 11.6;
-  var xsize = 7.175;
-  var margin = 0.2;
-  var xbottom = 3367.5;
-  var yright = 4467.5;
-  var tax = 1.845557;
-  var rect1 = drawGrid(1,1, xbottom-1*(xsize+margin)+margin/2, yright - 1*(ysize+margin)+margin/2, margin, xsize, ysize);
-  var rect2 = drawGrid(1,1, xbottom-1*(xsize+margin)+margin/2, yright - tax*(ysize+margin)+margin/2, margin, xsize, ysize*(tax-1));
-  g.taxRects = d3.selectAll(rect1.nodes().concat(rect2.nodes()));
-  g.taxRects.attr("fill","#FFCE6D")
-    .attr("class","highlighted");
-  g.taxRects.attr("opacity",0)
-    .transition()
-    .duration(duration)
-    .attr("opacity",1)
-    .on("end",cb);
-});
-
-var zoomBackOut = PromiseMaker(function(cb, duration) {
-  g.svg.transition()
-    .duration(duration)
-    .attr("viewBox","0 0 10000 5000")
-    .on("end", cb);
-});
-
-var removeMillionLines = PromiseMaker(function(cb, duration) {
-  g.millionLines.transition()
-    .duration(duration)
-    .attr("opacity",0)
-    .on("end", function() {
-      d3.select(this).remove();
-      cb();
-    });
-});
-
-var moveGroupsBack = PromiseMaker(function(cb, duration) {
-  g.svg.selectAll(".billionBox").each(function() {
-    var self = d3.select(this);
-    self.transition()
-      .duration(duration)
-      .attr("width",self.attr("data-orgwidth"))
-      .attr("height",self.attr("data-orgheight"))
-      .attr("x",self.attr("data-orgx"))
-      .attr("y", self.attr("data-orgy"))
-      .on("end", cb);
-  });
-  g.svg.selectAll(".highlighted").each(function() {
-    var self = d3.select(this);
-    var x = self.attr("x")*1;
-    var y = self.attr("y")*1;
-    self.transition()
-      .duration(duration)
-      .attr("x",x-55/2)
-      .attr("y",y-55/2);
-  });
-});
-
-var fadeOut = PromiseMaker(function(cb, duration) {
-  $(sel).find(".animation-wrap").fadeOut(duration, function() {
-    $(sel).find(".animation-wrap").show().css("visibility","hidden");
-  });
 });

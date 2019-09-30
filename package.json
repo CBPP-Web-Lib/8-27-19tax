@@ -5,6 +5,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
     "cbpp_figures": "github:CenterOnBudget/cbpp_figure",
+    "cbpp_colorgen": "github:CenterOnBudget/cbpp_colorgen",
     "comma-number": "^2.0.0",
     "d3": "^5.10.0",
     "jquery": "^1.12.4"
