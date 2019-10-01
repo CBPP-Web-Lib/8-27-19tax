@@ -15,6 +15,7 @@ var colors = colorgen("#D6E4F0","#5590BF",3);
 console.log(colors);
 require('./app.scss');
 var g = {};
+window.debugObj = g;
 g.DOM = require("./DOM.html");
 g.domLoaded = false; 
 g.data = [
@@ -104,7 +105,14 @@ function ready() {
       describeUntaxedIncome2(1000)
     ]))
     .then(describeUntaxedIncome3(1000))
-    .then(moveStuffAtEnd(500000));
+    .then(waitFor(5000))
+    .then(doMultiple([
+      moveStuffAtEnd(1000),
+      fadeOutUntaxedIncomeDesc(1000)
+    ]))
+    .then(describeUntaxedIncome4(1000))
+    .then(describeUntaxedIncome5(1000))
+    .then(describeUntaxedIncome6(1000));
 
 
 }
@@ -143,7 +151,7 @@ var PromiseMaker = function(asyncFunction) {
     };
   };
 };
-g.speedFactor = 10;
+g.speedFactor = 1;
 g.subgroupFontSize = 2.5;
 g.objects = {};
 g.formatters = {};
@@ -427,6 +435,47 @@ var describeUntaxedIncome2 = PromiseMaker(function(cb, duration) {
     obj.hide().fadeIn(duration, cb);
 });
 
+var fadeOutUntaxedIncomeDesc = PromiseMaker(function(cb, duration) {
+  g.objects.untaxedGainsFinal
+    .add(g.objects.untaxedGains)
+    .add(g.objects.untaxedGainsFinal2)
+    .add(g.objects.untaxedGainsFinal3)
+    .fadeOut(duration, cb);
+});
+
+var describeUntaxedIncome4 = PromiseMaker(function(cb, duration) {
+  var text = "←This income never even appears on the tax return.";
+  var obj = g.objects.untaxedGainsFinal4 = $(document.createElement("div"))
+    .addClass("annotation")
+    .css("left","32%")
+    .css("top","25%")
+    .text(text);
+  $(sel).find(".animation-inner").append(obj);
+    obj.hide().fadeIn(duration, cb);
+});
+
+var describeUntaxedIncome5 = PromiseMaker(function(cb, duration) {
+  var text = "↓This income is all the IRS knows about.";
+  var obj = g.objects.untaxedGainsFinal5 = $(document.createElement("div"))
+    .addClass("annotation")
+    .css("left","31%")
+    .css("top","90%")
+    .text(text);
+  $(sel).find(".animation-inner").append(obj);
+    obj.hide().fadeIn(duration, cb);
+});
+
+var describeUntaxedIncome6 = PromiseMaker(function(cb, duration) {
+  var text = "←This is the total tax paid.";
+  var obj = g.objects.untaxedGainsFinal6 = $(document.createElement("div"))
+    .addClass("annotation")
+    .css("left","38%")
+    .css("top","96%")
+    .text(text);
+  $(sel).find(".animation-inner").append(obj);
+    obj.hide().fadeIn(duration, cb);
+});
+
 var describeUntaxedIncome3 = PromiseMaker(function(cb, duration) {
   var text = "None of this income is taxable if the stock is never sold. These assets can be passed onto heirs, ensuring that tax will NEVER be paid on such gains.";
   var obj = g.objects.untaxedGainsFinal2 = $(document.createElement("div"))
@@ -565,16 +614,25 @@ var moveStuffAtEnd = PromiseMaker(function(cb, duration) {
       return r;
     });
   var starts2 = [];
+  var widths2 = [];
+  var heights2 = [];
   g.svg.selectAll("[data-identifier='restOfSalary'], [data-identifier='firstThousand'], [data-identifier='firstMillionOfCapGains']")
     .attr("opacity",0);
-  console.log(g.svg.selectAll("[data-identifier='restOfCapGains'], [data-identifier='firstMillionOfCapGains']"));
   g.svg.selectAll("[data-identifier='capGainsTax1'], [data-identifier='capGainsTax2'], [data-identifier='ordinaryTax']")
     .transition(duration)
+    //.attr("fill","#EB9123")
     .attr("x", function(d, i) {
       starts2[i] = starts2[i] || d3.select(this).attr("x")*1;
       var r = starts2[i] + g.billionSizeHoz + g.billionMargin + 6*g.millionSizeHoz;
-      console.log(r);
       return r;
+    })
+    .attr("width", function(d, i) {
+      widths2[i] = widths2[i] || d3.select(this).attr("width")*1;
+      return widths2[i]*1.5;
+    })
+    .attr("height", function(d, i) {
+      heights2[i] = heights2[i] || d3.select(this).attr("height")*1;
+      return heights2[i]*1.5;
     })
     .on("end", cb);
 });
