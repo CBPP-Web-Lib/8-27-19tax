@@ -42,7 +42,7 @@ function ready() {
 
   waitFor(200)()
     .then(introText(1000))
-    .then(waitFor(4000))
+    .then(waitFor(10000))
     .then(fadeOutIntroText(1000))
     .then(doMultiple([
       drawOneThousand(1000),
@@ -58,7 +58,7 @@ function ready() {
       describeSalaryTax(1000),
       ordinaryIncomeTaxBlocks(2500)
     ]))
-    .then(waitFor(3000))
+    .then(waitFor(6000))
     .then(doMultiple([
       fadeOutSalary(500),
       fadeOutSalaryTax(500)
@@ -107,13 +107,19 @@ function ready() {
     .then(describeUntaxedIncome3(1000))
     .then(waitFor(5000))
     .then(doMultiple([
-      moveStuffAtEnd(1000),
-      fadeOutUntaxedIncomeDesc(1000)
+      moveStuffAtEnd(3000),
+      fadeOutUntaxedIncomeDesc(3000)
     ]))
     .then(describeUntaxedIncome4(1000))
+    .then(waitFor(1000))
     .then(describeUntaxedIncome5(1000))
-    .then(describeUntaxedIncome6(1000));
-
+    .then(waitFor(1000))
+    .then(describeUntaxedIncome6(1000))
+    .then(waitFor(1000))
+    .then(zoomBackIn(4000))
+    .then(waitFor(2000))
+    .then(zoomBackOut(4000))
+    .then(fadeOutAllAtEnd(1000));
 
 }
 
@@ -197,7 +203,7 @@ var drawOneThousand = PromiseMaker(function(cb, duration) {
 
 var introText = PromiseMaker(function(cb, duration) {
   var text = "Imagine a billionaire founder of a large tech company. He or she might take a token salary of $100,000, but this would only be " +
-    "a very small portion of his or her overall economic income, most of which would be unrealized capital gains.";
+    "a very small portion of his or her overall economic income, most of which would be unrealized capital gains, which do not appear on tax returns.";
   var div = g.objects.introText = $(document.createElement("div"))
     .css("width","100%")
     .css("height","60%")
@@ -410,7 +416,7 @@ var fadeOutStockSalesExplainer = PromiseMaker(function(cb, duration) {
 });
 
 var describeUntaxedIncome = PromiseMaker(function(cb, duration) {
-  var text = "Individuals who own large amounts of stock might see annual changes in the value of their portfolios of $1 billion...";
+  var text = "Individuals who own large amounts of stock might see annual increases of $1 billion in the value of their portfolios...";
   var obj = g.objects.untaxedGains= $(document.createElement("div"))
     .addClass("annotation")
     .css("right",0)
@@ -477,13 +483,13 @@ var describeUntaxedIncome6 = PromiseMaker(function(cb, duration) {
 });
 
 var describeUntaxedIncome3 = PromiseMaker(function(cb, duration) {
-  var text = "None of this income is taxable if the stock is never sold. These assets can be passed onto heirs, ensuring that tax will NEVER be paid on such gains.";
+  var text = "None of this income is taxable or even appears on the tax return as long as the stock is never sold. These assets can be passed onto heirs, ensuring that income tax will NEVER be paid on such gains.";
   var obj = g.objects.untaxedGainsFinal2 = $(document.createElement("div"))
     .addClass("annotation")
     .css("right",0)
     .css("width","50%")
     .css("text-align","center")
-    .css("top","55%")
+    .css("top","53%")
     .text(text);
   $(sel).find(".animation-inner").append(obj);
     obj.hide().fadeIn(duration, cb);
@@ -606,20 +612,24 @@ var fillOutFirstMillionWithCapGains = PromiseMaker(function(cb, duration) {
 var moveStuffAtEnd = PromiseMaker(function(cb, duration) {
   var starts1 = [];
   g.svg.selectAll("[data-identifier='restOfCapGains'], [data-identifier='firstMillion']")
-    .transition(duration)
+    .raise()
+    .transition()
+    .duration(duration)
     .attr("x",function(d, i) {
       starts1[i] = starts1[i] || d3.select(this).attr("x")*1;
       var r = starts1[i] + g.billionSizeHoz + g.billionMargin;
-      console.log(r);
       return r;
     });
   var starts2 = [];
   var widths2 = [];
   var heights2 = [];
   g.svg.selectAll("[data-identifier='restOfSalary'], [data-identifier='firstThousand'], [data-identifier='firstMillionOfCapGains']")
-    .attr("opacity",0);
+    .attr("opacity",0)
+    .raise();
   g.svg.selectAll("[data-identifier='capGainsTax1'], [data-identifier='capGainsTax2'], [data-identifier='ordinaryTax']")
-    .transition(duration)
+    .raise()
+    .transition()
+    .duration(duration)
     //.attr("fill","#EB9123")
     .attr("x", function(d, i) {
       starts2[i] = starts2[i] || d3.select(this).attr("x")*1;
@@ -652,6 +662,136 @@ var fillOutRestOfCapGains = PromiseMaker(function(cb, duration) {
     transitionAtOnce:2
   }, cb);
 });
+
+var zoomBackOut = PromiseMaker(function(cb, duration) {
+  g.svg.transition()
+    .duration(duration)
+    .attr("viewBox", "0 -16000 32000 16000")
+    .on("end", function() {
+      textLocks.removeLock("totalTaxPaid");
+      textLocks.removeLock("IRSknown");
+      textLocks.removeLock("Billions");
+      cb();
+    });
+});
+
+var zoomBackIn = PromiseMaker(function(cb, duration) {
+
+  var bottomRightCapGains = $(sel).find("rect[data-identifier='capGainsTax2']");
+  bottomRightCapGains.sort(function(el1, el2) {
+    var $el1 = $(el1);
+    var $el2 = $(el2);
+    var x1 = $el1.attr("x")*1;
+    var x2 = $el2.attr("x")*1;
+    var y1 = $el1.attr("y")*1;
+    var y2 = $el2.attr("y")*1;
+    if (x1===x2) {
+      return y2 - y1;
+    } else {
+      return x1 - x2;
+    }
+  });
+
+  var topLeftCapGains = $(sel).find("rect[data-identifier='restOfCapGains']");
+  topLeftCapGains.sort(function(el1, el2) {
+    var $el1 = $(el1);
+    var $el2 = $(el2);
+    var x1 = $el1.attr("x")*1;
+    var x2 = $el2.attr("x")*1;
+    var y1 = $el1.attr("y")*1;
+    var y2 = $el2.attr("y")*1;
+    if (x1===x2) {
+      return y1 - y2;
+    } else {
+      return x2 - x1;
+    }
+  });
+
+  var topRightBillions = $(sel).find("rect[data-identifier='firstBillionUntaxed']");
+  topRightBillions.sort(function(el1, el2) {
+    var $el1 = $(el1);
+    var $el2 = $(el2);
+    var x1 = $el1.attr("x")*1;
+    var x2 = $el2.attr("x")*1;
+    var y1 = $el1.attr("y")*1;
+    var y2 = $el2.attr("y")*1;
+    if (x1===x2) {
+      return y1 - y2;
+    } else {
+      return x1 - x2;
+    }
+  });
+
+
+  textLocks.lockTextElToSVGEl(
+    g.objects.untaxedGainsFinal6[0], 
+    bottomRightCapGains[bottomRightCapGains.length - 1], 
+    "totalTaxPaid"
+  );
+
+  textLocks.lockTextElToSVGEl(
+    g.objects.untaxedGainsFinal5[0],
+    topLeftCapGains[topLeftCapGains.length - 1],
+    "IRSknown"
+  );
+
+  textLocks.lockTextElToSVGEl(
+    g.objects.untaxedGainsFinal4[0],
+    topRightBillions[topRightBillions.length - 1],
+    "Billions"
+  );
+
+  g.svg.transition()
+    .duration(duration)
+    .attr("viewBox", "9800 -1600 3200 1600")
+    .on("end", cb);
+});
+
+var TextLocker = function() {
+  var locks = {};
+  this.lockTextElToSVGEl = function(textEl, svgEl, lockid) {
+    var startingSVGCoords = $(svgEl).offset();
+    console.log(startingSVGCoords);
+    var startingTextCoords = {
+      top: $(textEl).offset().top - $(textEl).parent().offset().top,
+      left: $(textEl).offset().left - $(textEl).parent().offset().left
+    };
+    console.log(startingTextCoords);
+    locks[lockid] = true;
+    var frame = function() {
+      if (locks[lockid]) {
+        var svgCoords = $(svgEl).offset();
+        var change = {
+          top: svgCoords.top - startingSVGCoords.top,
+          left: svgCoords.left - startingSVGCoords.left
+        };
+        //console.log(change);
+        var textCoords = {
+          top: startingTextCoords.top + change.top,
+          left: startingTextCoords.left + change.left
+        };
+        $(textEl).css({
+          top: textCoords.top + "px",
+          left: textCoords.left + "px",
+          bottom:"",
+          right:""
+        });
+        window.requestAnimationFrame(frame);
+      }
+    };
+    window.requestAnimationFrame(frame);
+  };
+  this.removeLock = function(lockid) {
+    delete(locks[lockid]);
+  };
+};
+
+var fadeOutAllAtEnd = PromiseMaker(function(cb, duration) {
+  $(g.svg.node()).fadeOut(duration, cb);
+  $(sel).find(".annotation").fadeOut(duration);
+});
+
+var textLocks = new TextLocker();
 
 var capGainsTax1 = PromiseMaker(function(cb, duration) {
   fadeInNewBlocks({
