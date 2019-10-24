@@ -17,6 +17,10 @@ require('./app.scss');
 var g = {};
 window.debugObj = g;
 g.DOM = require("./DOM.html");
+g.d3 = d3;
+g.$ = $;
+g.colors = colors;
+g.sel = sel;
 g.domLoaded = false; 
 g.data = [
   [23.7,0.6,0.5,1.5,27.2],
@@ -38,32 +42,75 @@ function ready() {
   script.before(wrap); 
   wrap.html(g.DOM);
   g.svg = d3.select(".animation-inner").append("svg")
-    .attr("viewBox","0 -80 160 80");
-
-  waitFor(200)()
-    .then(introText(1000))
-    .then(waitFor(10000))
-    .then(fadeOutIntroText(1000))
+    .attr("viewBox","0 -50 100 50");
+  var e = g.events;
+  g.speedFactor = 1;
+  e.waitFor(200)()
+    .then(e.drawOneThousand(1000))
+    .then(e.describeOneThousand(1000))
+    .then(e.waitFor(2000))
+    .then(e.introText(1000))
+    .then(e.waitFor(1000))
+    .then(e.describeSalary(1000))
     .then(doMultiple([
-      drawOneThousand(1000),
-      describeOneThousand(1000)
-    ]))
-    .then(waitFor(2000))
-    .then(fadeOutOneThousandDescription(500))
-    .then(doMultiple([
-      describeSalary(1000),
-      seriesOfAdditionalBlocks(5000)
+      e.zoomToViewBoxMaker("0 -200 400 200")(2000, 1000),
+      e.seriesOfAdditionalBlocks(3000),
+      e.fadeOutOneThousandDescription(2000, 1000)
     ]))
     .then(doMultiple([
-      describeSalaryTax(1000),
-      ordinaryIncomeTaxBlocks(2500)
+      e.restOfSalary(4000),
+      e.recolorStartBox(1000)
     ]))
-    .then(waitFor(6000))
     .then(doMultiple([
-      fadeOutSalary(500),
-      fadeOutSalaryTax(500)
+      e.describeSalaryTax(1000),
+      e.ordinaryIncomeTaxBlocks(4000)
     ]))
-    .then(waitFor(1000))
+    .then(e.waitFor(1000))
+    .then(doMultiple([
+      e.fadeOutSalary(500),
+      e.fadeOutSalaryTax(500),
+      e.fadeOutIntroText(500)
+    ]))
+    .then(doMultiple([
+      e.fadeInCover(500),
+      e.fadeInStockExplainer(500)
+    ]))
+    .then(e.waitFor(2000))
+    .then(doMultiple([
+      e.zoomToViewBoxMaker("0 -2500 5000 2500")(3000),
+      e.realizedGainsExplainer(1000),
+      e.fadeInCapGains(3000),
+      e.fadeOutCover(500, 2500)
+    ]))
+    .then(e.waitFor(1000))
+    .then(doMultiple([
+      e.fadeInCapGainsTax(3000),
+      e.realizedGainsTaxExplainer(1000)
+    ]))
+    .then(e.waitFor(2000))
+    .then(e.fadeOutGains(1000))
+    
+    .then(doMultiple([
+      e.zoomToViewBoxMaker("0 -7800 15600 7800")(6000),
+      e.fadeInCover2(500, 2000),
+      e.unrealizedExplainer(500, 2000),
+      e.unrealizedGains(3000, 2000),
+      e.solidifyTax(6000)
+    ]))
+    
+    .then(e.unrealizedExplainer2(1000))
+    .then(e.waitFor(3000))
+    .then(doMultiple([
+      e.fadeOutUnrealizedExplainers(1000),
+      e.moveIncome(2000),
+      e.moveUnrealizedIncome(2000),
+      e.solidifyAll(2000)
+    ]))
+    .then(e.explainUnrealized(2000))
+    .then(e.explainRealized(2000))
+    .then(e.explainTax(2000))
+    .then(e.summary(2000));
+    /*
     .then(doMultiple([
       zoomToFirstMillionView(2000),
       describeCapGains(500),
@@ -120,7 +167,7 @@ function ready() {
     .then(waitFor(2000))
     .then(zoomBackOut(4000))
     .then(fadeOutAllAtEnd(1000));
-
+*/
 }
 
 var doMultiple = function(arr) {
@@ -138,7 +185,7 @@ var doMultiple = function(arr) {
   };
 };
 
-var PromiseMaker = function(asyncFunction) {
+g.PromiseMaker = function(asyncFunction) {
   return function(duration, delay) {
     return function() {
       return new Promise(function(resolve, reject) {
@@ -157,7 +204,7 @@ var PromiseMaker = function(asyncFunction) {
     };
   };
 };
-g.speedFactor = 1;
+
 g.subgroupFontSize = 2.5;
 g.objects = {};
 g.formatters = {};
@@ -182,717 +229,11 @@ g.thousandSizeVert = g.millionSizeVert / g.thousandVert - g.thousandMargin + g.t
 
 console.log(g);
 
-var drawOneThousand = PromiseMaker(function(cb, duration) {
-  g.shapes = g.svg.append("g")
-    .attr("class","shapes")
-    .attr("transform","matrix(1 0 0 -1 0 0)");
-  fadeInNewBlocks({
-    duration:duration,
-    xsize:1,
-    ysize:1,
-    xstart: 0,
-    ystart: 0,
-    width: g.thousandSizeHoz,
-    height: g.thousandSizeVert,
-    margin: g.thousandMargin,
-    identifier:"firstThousand",
-    color:colors[0],
-    transitionAtOnce:1
-  }, cb);
-});
-
-var introText = PromiseMaker(function(cb, duration) {
-  var text = "Imagine a billionaire founder of a large tech company. He or she might take a token salary of $100,000, but this would only be " +
-    "a very small portion of his or her overall economic income, most of which would be unrealized capital gains, which do not appear on tax returns.";
-  var div = g.objects.introText = $(document.createElement("div"))
-    .css("width","100%")
-    .css("height","60%")
-    .css("position","absolute")
-    .css("top","40%")
-    .css("left",0)
-    .css("text-align","center")
-    .css("font-size","24pt")
-    .text(text);
-  $(sel).find(".animation-inner").append(div);
-  div.hide().fadeIn(duration, cb);
-});
-
-var fadeOutIntroText = PromiseMaker(function(cb, duration) {
-  g.objects.introText.fadeOut(duration, cb);
-});
-
-var describeOneThousand = PromiseMaker(function(cb, duration) {
-  var coords = svgCoordsToPercentOfViewBox(g.thousandSizeHoz*1.3,g.thousandSizeVert);
-  var text = g.objects.describeOneThousand = $(document.createElement("div"))
-    .addClass("annotation")
-    .html("&larr; This block represents one thousand dollars.")
-    .css("left", (coords.x*100) + "%")
-    .css("top", (coords.y*100) + "%");
-  $(sel).find(".animation-inner").append(text);
-  text.hide().fadeIn(duration, cb);
-});
-
-var describeSalary = PromiseMaker(function(cb, duration) {
-  var text = "The CEO takes a token salary of $100,000.";
-  var obj = g.objects.salaryDesc = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right",0)
-    .css("top","20%")
-    .css("width","50%")
-    .css("text-align","center")
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-var describeSalaryTax = PromiseMaker(function(cb, duration) {
-  var text = "The top individual income tax rate is 37%, plus 7.65% in payroll taxes - a tax bill of about $45,000.";
-  var obj = g.objects.salaryTaxDesc = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right",0)
-    .css("width","50%")
-    .css("text-align","center")
-    .css("top","50%")
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-var describeCapGains = PromiseMaker(function(cb, duration) {
-  var text = "To cover the expenses of a luxury lifestyle, the billionaire sells stock each year...";
-  var obj = g.objects.capGainsDesc = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right",0)
-    .css("width","30%")
-    .css("text-align","center")
-    .css("top","10%")
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-var backfillFirstMillion = PromiseMaker(function(cb, duration) {
-  fadeInNewBlocks({
-    duration:duration,
-    width: g.millionSizeHoz,
-    height: g.millionSizeVert,
-    margin: g.millionMargin,
-    identifier: "firstMillion",
-    xsize:1,
-    ysize:1,
-    transitionAtOnce:1,
-    color:colors[1],
-    prepend:true
-  }, cb);
-});
-
-var finishCapGainsDesc = PromiseMaker(function(cb, duration) {
-  var text = "...up to $6 million.";
-  var obj = g.objects.capGainsDesc2 = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right",0)
-    .css("width","30%")
-    .css("text-align","center")
-    .css("top","40%")
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-var labelOneMillion = PromiseMaker(function(cb, duration) {
-  var outer_wrap = g.objects.oneMillionLabel = $(document.createElement("div"));
-  outer_wrap.css({
-    left:"56%",
-    top:"0%",
-    width:"20%",
-    height:"100%",
-    display:"block"
-  }).addClass("annotation");
-  var inner_wrap = $(document.createElement("div"));
-  inner_wrap.css({
-    "white-space":"nowrap",
-    height:"100%"
-  });
-  var bracket = $(document.createElement("div"));
-  bracket.css({
-    display:"inline-block",
-    "font-size":"100pt",
-    "font-family":"Bravura",
-    transform:"scaleY(2.5)",
-    position:"relative",
-    top:"120pt"
-  }).html("");
-  var text = $(document.createElement("div"));
-  text.css({
-    display:"inline-block",
-    "font-size":"20pt",
-    top:"2pt",
-    left:"4pt",
-    position:"relative"
-  }).text("one million dollars");
-  outer_wrap.append(inner_wrap);
-  inner_wrap.append(bracket, text);
-  $(sel).find(".animation-inner").append(outer_wrap);
-  outer_wrap.hide().fadeIn(duration, cb);
-    
-});
-
-var labelOneBillion = PromiseMaker(function(cb, duration) {
-  var outer_wrap = g.objects.oneBillionLabel = $(document.createElement("div"));
-  outer_wrap.css({
-    left:"55%",
-    top:"5%",
-    width:"20%",
-    height:"100%",
-    display:"block"
-  }).addClass("annotation");
-  var inner_wrap = $(document.createElement("div"));
-  inner_wrap.css({
-    "white-space":"nowrap",
-    height:"100%"
-  });
-  var bracket = $(document.createElement("div"));
-  bracket.css({
-    display:"inline-block",
-    "font-size":"100pt",
-    "font-family":"Bravura",
-    transform:"scaleY(1.5)",
-    position:"relative",
-    top:"120pt"
-  }).html("");
-  var text = $(document.createElement("div"));
-  text.css({
-    display:"inline-block",
-    "font-size":"20pt",
-    top:"50pt",
-    left:"4pt",
-    position:"relative"
-  }).text("one billion dollars");
-  outer_wrap.append(inner_wrap);
-  inner_wrap.append(bracket, text);
-  $(sel).find(".animation-inner").append(outer_wrap);
-  outer_wrap.hide().fadeIn(duration, cb);
-    
-});
-
-var fadeOutBracket = PromiseMaker(function(cb, duration) {
-  g.objects.oneMillionLabel.fadeOut(duration, cb);
-});
-
-var describeCapGainsTax = PromiseMaker(function(cb, duration) {
-  var text = "Income from these stock sales is taxed at a preferential rate of 23.8%.";
-  var obj = g.objects.capGainsTaxDesc = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right",0)
-    .css("width","30%")
-    .css("text-align","center")
-    .css("top","50%")
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-var prepareUntaxed = PromiseMaker(function(cb, duration) {
-  var text = "But this is still only a very small portion of his or her economic income.";
-  var obj = g.objects.untaxedPrep = $(document.createElement("div"))
-  .addClass("annotation")
-  .css("right",0)
-  .css("width","30%")
-  .css("text-align","center")
-  .css("top","80%")
-  .text(text);
-  $(sel).find(".animation-inner").append(obj);
-  obj.hide().fadeIn(duration, cb);
-});
 
 
 
 
-var fadeOutStockSalesExplainer = PromiseMaker(function(cb, duration) {
-  g.objects.capGainsDesc.fadeOut(duration, cb);
-  g.objects.capGainsTaxDesc.fadeOut(duration);
-  g.objects.untaxedPrep.fadeOut(duration);
-  g.objects.capGainsDesc2.fadeOut(duration);
-});
-
-var describeUntaxedIncome = PromiseMaker(function(cb, duration) {
-  var text = "Individuals who own large amounts of stock might see annual increases of $1 billion in the value of their portfolios...";
-  var obj = g.objects.untaxedGains= $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right",0)
-    .css("width","50%")
-    .css("text-align","center")
-    .css("top","5%")
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-var describeUntaxedIncome2 = PromiseMaker(function(cb, duration) {
-  var text = "...or even $2 or $3 billion.";
-  var obj = g.objects.untaxedGainsFinal = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right",0)
-    .css("width","50%")
-    .css("text-align","center")
-    .css("top","30%")
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-var fadeOutUntaxedIncomeDesc = PromiseMaker(function(cb, duration) {
-  g.objects.untaxedGainsFinal
-    .add(g.objects.untaxedGains)
-    .add(g.objects.untaxedGainsFinal2)
-    .add(g.objects.untaxedGainsFinal3)
-    .fadeOut(duration, cb);
-});
-
-var describeUntaxedIncome4 = PromiseMaker(function(cb, duration) {
-  var text = "←This income never even appears on the tax return.";
-  var obj = g.objects.untaxedGainsFinal4 = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("left","32%")
-    .css("top","25%")
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-var describeUntaxedIncome5 = PromiseMaker(function(cb, duration) {
-  var text = "↓This income is all the IRS knows about.";
-  var obj = g.objects.untaxedGainsFinal5 = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("left","31%")
-    .css("top","90%")
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-var describeUntaxedIncome6 = PromiseMaker(function(cb, duration) {
-  var text = "←This is the total tax paid.";
-  var obj = g.objects.untaxedGainsFinal6 = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("left","38%")
-    .css("top","96%")
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-var describeUntaxedIncome3 = PromiseMaker(function(cb, duration) {
-  var text = "None of this income is taxable or even appears on the tax return as long as the stock is never sold. These assets can be passed onto heirs, ensuring that income tax will NEVER be paid on such gains.";
-  var obj = g.objects.untaxedGainsFinal2 = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right",0)
-    .css("width","50%")
-    .css("text-align","center")
-    .css("top","53%")
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-  
-});
-
-var fadeOutBillionBracket = PromiseMaker(function(cb, duration) {
-  g.objects.oneBillionLabel.fadeOut(duration, cb);
-});
-
-var fadeIn3Billion = PromiseMaker(function(cb, duration) {
-  fadeInNewBlocks({
-    skipList:{0:{0:true}},
-    duration:duration,
-    identifier:"threeBillion",
-    width: g.billionSizeHoz,
-    height: g.billionSizeVert,
-    margin: g.billionMargin,
-    xsize:1,
-    ysize:3,
-    transitionAtOnce:1,
-    color:"#aaaaaa"
-  }, cb);
-});
-
-function svgCoordsToPercentOfViewBox(x, y) {
-  var viewBox = g.svg.attr("viewBox").split(" ");
-  var left = (x - viewBox[0])/(viewBox[2]);
-  var bottom = (y - viewBox[1])/(viewBox[3])-1;
-  return {x:left,y:1-bottom};
-}
-
-var fadeOutOneThousandDescription = PromiseMaker(function(cb, duration) {
-  g.objects.describeOneThousand.fadeOut(duration, cb);
-});
-
-var fadeOutSalaryTax = PromiseMaker(function(cb, duration) {
-  g.objects.salaryTaxDesc.fadeOut(duration, cb);
-});
-
-var fadeOutSalary = PromiseMaker(function(cb, duration) {
-  g.objects.salaryDesc.fadeOut(duration, cb);
-});
-
-var seriesOfAdditionalBlocks = PromiseMaker(function(cb, duration) {
-  fadeInNewBlocks({
-    skipList:{0:{0:true}},
-    duration:duration,
-    width: g.thousandSizeHoz,
-    height: g.thousandSizeVert,
-    margin: g.thousandMargin,
-    xsize:10,
-    ysize:10,
-    transitionAtOnce:25,
-    identifier:"restOfSalary"
-  }, cb);
-});
-
-var ordinaryIncomeTaxBlocks = PromiseMaker(function(cb, duration) {
-  fadeInNewBlocks({
-    duration:duration,
-    width: g.thousandSizeHoz,
-    height: g.thousandSizeVert,
-    margin: g.thousandMargin,
-    xsize:10,
-    ysize:5,
-    color:"#C75459",
-    identifier:"ordinaryTax",
-    skipArray:[{rows: 1, cols: 5, rowstart: 4, colstart: 5}],
-    transitionAtOnce:5
-  }, cb);
-});
-
-var zoomToFirstMillionView = PromiseMaker(function(cb, duration) {
-  g.svg.transition()
-    .duration(duration)
-    .attr("viewBox", "0 -200 400 200")
-    .on("end", cb);
-});
-
-var zoomToRealizedGainsView = PromiseMaker(function(cb, duration) {
-  g.svg.transition()
-    .duration(duration)
-    .attr("viewBox", "0 -600 1200 600")
-    .on("end", cb);
-});
-
-var zoomToFurthestOutView = PromiseMaker(function(cb, duration) {
-  g.svg.transition()
-    .duration(duration)
-    .attr("viewBox", "0 -9000 18000 9000")
-    .on("end", cb);
-});
-
-
-var zoomOutEvenFurther = PromiseMaker(function(cb, duration) {
-  g.svg.transition()
-    .duration(duration)
-    .attr("viewBox", "0 -16000 32000 16000")
-    .on("end", cb);
-});
-
-
-var fillOutFirstMillionWithCapGains = PromiseMaker(function(cb, duration) {
-  fadeInNewBlocks({
-    duration:duration,
-    width: g.thousandSizeHoz,
-    height: g.thousandSizeVert,
-    margin: g.thousandMargin,
-    xsize:40,
-    color:colors[1],
-    ysize:25,
-    verticalOrder:true,
-    identifier:"firstMillionOfCapGains",
-    skipArray:[{rows: 10, cols: 10, rowstart: 0, colstart: 0}],
-    transitionAtOnce:100
-  }, cb);
-});
-
-var moveStuffAtEnd = PromiseMaker(function(cb, duration) {
-  var starts1 = [];
-  g.svg.selectAll("[data-identifier='restOfCapGains'], [data-identifier='firstMillion']")
-    .raise()
-    .transition()
-    .duration(duration)
-    .attr("x",function(d, i) {
-      starts1[i] = starts1[i] || d3.select(this).attr("x")*1;
-      var r = starts1[i] + g.billionSizeHoz + g.billionMargin;
-      return r;
-    });
-  var starts2 = [];
-  var widths2 = [];
-  var heights2 = [];
-  g.svg.selectAll("[data-identifier='restOfSalary'], [data-identifier='firstThousand'], [data-identifier='firstMillionOfCapGains']")
-    .attr("opacity",0)
-    .raise();
-  g.svg.selectAll("[data-identifier='capGainsTax1'], [data-identifier='capGainsTax2'], [data-identifier='ordinaryTax']")
-    .raise()
-    .transition()
-    .duration(duration)
-    //.attr("fill","#EB9123")
-    .attr("x", function(d, i) {
-      starts2[i] = starts2[i] || d3.select(this).attr("x")*1;
-      var r = starts2[i] + g.billionSizeHoz + g.billionMargin + 6*g.millionSizeHoz;
-      return r;
-    })
-    .attr("width", function(d, i) {
-      widths2[i] = widths2[i] || d3.select(this).attr("width")*1;
-      return widths2[i]*1.5;
-    })
-    .attr("height", function(d, i) {
-      heights2[i] = heights2[i] || d3.select(this).attr("height")*1;
-      return heights2[i]*1.5;
-    })
-    .on("end", cb);
-});
-
-var fillOutRestOfCapGains = PromiseMaker(function(cb, duration) {
-  fadeInNewBlocks({
-    duration:duration,
-    xsize:3,
-    ysize:2,
-    color:colors[1],
-    identifier:"restOfCapGains",
-    skipList:{
-      0:{
-        0:true
-      }
-    },
-    transitionAtOnce:2
-  }, cb);
-});
-
-var zoomBackOut = PromiseMaker(function(cb, duration) {
-  g.svg.transition()
-    .duration(duration)
-    .attr("viewBox", "0 -16000 32000 16000")
-    .on("end", function() {
-      textLocks.removeLock("totalTaxPaid");
-      textLocks.removeLock("IRSknown");
-      textLocks.removeLock("Billions");
-      cb();
-    });
-});
-
-var zoomBackIn = PromiseMaker(function(cb, duration) {
-
-  var bottomRightCapGains = $(sel).find("rect[data-identifier='capGainsTax2']");
-  bottomRightCapGains.sort(function(el1, el2) {
-    var $el1 = $(el1);
-    var $el2 = $(el2);
-    var x1 = $el1.attr("x")*1;
-    var x2 = $el2.attr("x")*1;
-    var y1 = $el1.attr("y")*1;
-    var y2 = $el2.attr("y")*1;
-    if (x1===x2) {
-      return y2 - y1;
-    } else {
-      return x1 - x2;
-    }
-  });
-
-  var topLeftCapGains = $(sel).find("rect[data-identifier='restOfCapGains']");
-  topLeftCapGains.sort(function(el1, el2) {
-    var $el1 = $(el1);
-    var $el2 = $(el2);
-    var x1 = $el1.attr("x")*1;
-    var x2 = $el2.attr("x")*1;
-    var y1 = $el1.attr("y")*1;
-    var y2 = $el2.attr("y")*1;
-    if (x1===x2) {
-      return y1 - y2;
-    } else {
-      return x2 - x1;
-    }
-  });
-
-  var topRightBillions = $(sel).find("rect[data-identifier='firstBillionUntaxed']");
-  topRightBillions.sort(function(el1, el2) {
-    var $el1 = $(el1);
-    var $el2 = $(el2);
-    var x1 = $el1.attr("x")*1;
-    var x2 = $el2.attr("x")*1;
-    var y1 = $el1.attr("y")*1;
-    var y2 = $el2.attr("y")*1;
-    if (x1===x2) {
-      return y1 - y2;
-    } else {
-      return x1 - x2;
-    }
-  });
-
-
-  textLocks.lockTextElToSVGEl(
-    g.objects.untaxedGainsFinal6[0], 
-    bottomRightCapGains[bottomRightCapGains.length - 1], 
-    "totalTaxPaid"
-  );
-
-  textLocks.lockTextElToSVGEl(
-    g.objects.untaxedGainsFinal5[0],
-    topLeftCapGains[topLeftCapGains.length - 1],
-    "IRSknown"
-  );
-
-  textLocks.lockTextElToSVGEl(
-    g.objects.untaxedGainsFinal4[0],
-    topRightBillions[topRightBillions.length - 1],
-    "Billions"
-  );
-
-  g.svg.transition()
-    .duration(duration)
-    .attr("viewBox", "9800 -1600 3200 1600")
-    .on("end", cb);
-});
-
-var TextLocker = function() {
-  var locks = {};
-  this.lockTextElToSVGEl = function(textEl, svgEl, lockid) {
-    var startingSVGCoords = $(svgEl).offset();
-    console.log(startingSVGCoords);
-    var startingTextCoords = {
-      top: $(textEl).offset().top - $(textEl).parent().offset().top,
-      left: $(textEl).offset().left - $(textEl).parent().offset().left
-    };
-    console.log(startingTextCoords);
-    locks[lockid] = true;
-    var frame = function() {
-      if (locks[lockid]) {
-        var svgCoords = $(svgEl).offset();
-        var change = {
-          top: svgCoords.top - startingSVGCoords.top,
-          left: svgCoords.left - startingSVGCoords.left
-        };
-        //console.log(change);
-        var textCoords = {
-          top: startingTextCoords.top + change.top,
-          left: startingTextCoords.left + change.left
-        };
-        $(textEl).css({
-          top: textCoords.top + "px",
-          left: textCoords.left + "px",
-          bottom:"",
-          right:""
-        });
-        window.requestAnimationFrame(frame);
-      }
-    };
-    window.requestAnimationFrame(frame);
-  };
-  this.removeLock = function(lockid) {
-    delete(locks[lockid]);
-  };
-};
-
-var fadeOutAllAtEnd = PromiseMaker(function(cb, duration) {
-  $(g.svg.node()).fadeOut(duration, cb);
-  $(sel).find(".annotation").fadeOut(duration);
-});
-
-var textLocks = new TextLocker();
-
-var capGainsTax1 = PromiseMaker(function(cb, duration) {
-  fadeInNewBlocks({
-    duration:duration,
-    xsize:40,
-    ysize:25,
-    width: g.thousandSizeHoz,
-    height: g.thousandSizeVert,
-    margin: g.thousandMargin,
-    identifier:"capGainsTax1",
-    skipArray: [
-      {
-        rows:10,
-        cols:10,
-        rowstart:0,
-        colstart:0
-      }
-    ],
-    color:"#C75459",
-    transitionAtOnce:100
-  }, cb);
-});
-
-var capGainsTax2 = PromiseMaker(function(cb, duration) {
-  var config = {
-    duration:duration,
-    xsize:40,
-    ysize:13,
-    xstart: g.millionSizeHoz + g.millionMargin,
-    ystart: 0,
-    width: g.thousandSizeHoz,
-    height: g.thousandSizeVert,
-    margin: g.thousandMargin,
-    identifier:"capGainsTax2",
-    skipArray: [
-      {
-        rows:1,
-        cols:16,
-        rowstart:12,
-        colstart:24
-      }
-    ],
-    color:"#C75459",
-    transitionAtOnce:100
-  };
-  fadeInNewBlocks(config, cb);
-});
-
-var fadeInFirstBillionOfUntaxedIncome = PromiseMaker(function(cb, duration) {
-  var config = {
-    duration:duration,
-    xsize:40,
-    ysize:25,
-    xstart:0,
-    ystart:0,
-    width: g.millionSizeHoz,
-    height: g.millionSizeVert,
-    margin: g.millionMargin,
-    verticalOrder: true,
-    identifier:"firstBillionUntaxed",
-    skipArray: [
-      {
-        rows:2,
-        cols:3,
-        rowstart:0,
-        colstart:0
-      }
-    ],
-    color:"#aaaaaa",
-    transitionAtOnce:10
-  };
-  fadeInNewBlocks(config, cb);
-});
-
-var solidifyTax = PromiseMaker(function(cb, duration) {
-  var identifiers = [
-    "restOfSalary",
-    "capGainsTax1",
-    "capGainsTax2",
-    "ordinaryTax",
-    "firstThousand"
-  ];
-  var selector = [];
-  identifiers.forEach(function(el) {
-    selector.push("[data-identifier='" + el + "']");
-  });
-  selector = selector.join(",");
-  var gridTax = g.svg.selectAll(selector).filter(function() {
-    return d3.select(this).attr("data-gridless")===true;
-  });
-  var gridlessTax = g.svg.selectAll(selector).filter("[data-gridless]");
-  gridlessTax.transition()
-    .duration(duration)
-    .attr("opacity",1)
-    .on("end", cb);
-  gridTax.transition()
-    .duration(duration)
-    .attr("opacity",0);
-});
-
-var fadeInNewBlocks = function(config, cb) {
+g.fadeInNewBlocks = function(config, cb) {
 
   var width = config.width || g.millionSizeHoz;
   var height = config.height || g.millionSizeVert;
@@ -908,6 +249,7 @@ var fadeInNewBlocks = function(config, cb) {
   var verticalOrder = config.verticalOrder || false;
   var color = config.color || colors[0];
   var identifier = config.identifier;
+  var opacity = config.opacity || 1;
   var modSkipList = function(list, confs) {
     for (var i = 0, ii = confs.length; i<ii; i++) {
       var conf = confs[i];
@@ -957,7 +299,7 @@ var fadeInNewBlocks = function(config, cb) {
     var y0 = (0-m)*x0;
     var r = [];
     for (var i = 0;i<n;i++) {
-      r.push(Math.max(0,Math.min(1,m*i + y0)));
+      r.push(Math.max(0,Math.min(1,m*i + y0))*opacity);
     }
     return r;
   };
@@ -965,6 +307,7 @@ var fadeInNewBlocks = function(config, cb) {
   var blocks, gridlessBlocks;
 
   var makeBlocks = function() {
+    console.log("xstart", xstart);
     var id = "c" + xsize + "_" + ysize + "_" + xstart + "_" + ystart + "_" + width + "_" + height + "_" + margin + "_" + color.replace("#","");
     id = id.replace(/\./g,"d");
     blocks = g.shapes.selectAll("rect." + id)
@@ -1001,8 +344,8 @@ var fadeInNewBlocks = function(config, cb) {
             if (identifier) {return identifier;}
           })
           .attr("data-gridless",true)
-          .attr("width",width + margin*1.1)
-          .attr("height",height + margin*1.1)
+          .attr("width",width + margin*2)
+          .attr("height",height + margin*2)
           .attr("fill",color)
           .attr("opacity",0);
     });
@@ -1033,7 +376,4 @@ var fadeInNewBlocks = function(config, cb) {
   frame();
 };
 
-/*repeated events*/
-var waitFor = PromiseMaker(function(cb, duration) {
-  setTimeout(cb, duration);
-});
+require("./events.js")(g);
