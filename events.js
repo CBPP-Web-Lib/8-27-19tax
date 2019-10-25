@@ -126,7 +126,7 @@ g.events.fadeOutCover = PromiseMaker(function(cb, duration) {
 });
 
 g.events.fadeInStockExplainer = PromiseMaker(function(cb, duration) {
-  var text = "But most of her income comes from appreciation on her large holdings of her company’s stock, which gain about $1 billion per year in value.";
+  var text = "But most of her income comes from her large holdings of her company’s stock, which gain about $1 billion per year in value.";
   var obj = g.objects.stockExplainer = $(document.createElement("div"))
     .addClass("annotation")
     .css("right",0)
@@ -139,7 +139,7 @@ g.events.fadeInStockExplainer = PromiseMaker(function(cb, duration) {
 });
 
 g.events.realizedGainsExplainer = PromiseMaker(function(cb, duration) {
-  var text = "Assume she sells $100 million worth of stock each year, and the entire amount represents capital gain.";
+  var text = "Now, let's assume she sells $100 million worth of stock each year, and the entire amount represents capital gain.";
   var obj = g.objects.realizedGainsExplainer = $(document.createElement("div"))
     .addClass("annotation")
     .css("right",0)
@@ -153,11 +153,11 @@ g.events.realizedGainsExplainer = PromiseMaker(function(cb, duration) {
 
 g.events.realizedGainsTaxExplainer = PromiseMaker(function(cb, duration) {
   console.log("hello");
-  var text = "This capital gains income is taxed at a 23.8% rate, well below the 37% top rate on wages and salaries.";
+  var text = "That gain is taxed at a 23.8% rate, well below the 37% top rate on wages and salaries.";
   var obj = g.objects.realizedGainsTaxExplainer = $(document.createElement("div"))
     .addClass("annotation")
     .css("right",0)
-    .css("top","70%")
+    .css("top","75%")
     .css("width","40%")
     .css("text-align","center")
     .text(text);
@@ -191,19 +191,6 @@ g.events.unrealizedGains = PromiseMaker(function(cb, duration) {
   }, cb);
 });
 
-
-g.events.describeCapGains = PromiseMaker(function(cb, duration) {
-  var text = "To cover the expenses of a luxury lifestyle, the billionaire sells stock each year...";
-  var obj = g.objects.capGainsDesc = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right",0)
-    .css("width","30%")
-    .css("text-align","center")
-    .css("top","10%")
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
 
 g.events.fadeInCapGains = PromiseMaker(function(cb, duration) {
   fadeInNewBlocks({
@@ -251,7 +238,7 @@ g.events.gainsTaxExplainer = PromiseMaker(function(cb, duration) {
 });
 
 g.events.unrealizedExplainer = PromiseMaker(function(cb, duration) {
-  var text = "The rest of the $1 billion-a-year growth in her stock holdings isn’t taxable until — or unless — she sells the stock.";
+  var text = "She doesn’t pay any tax on the rest of the $1 billion-a-year growth in her stock, until she sells any of it.";
   var obj = g.objects.unrealizedExplainer = $(document.createElement("div"))
     .addClass("annotation")
     .css("right","5%")
@@ -264,7 +251,7 @@ g.events.unrealizedExplainer = PromiseMaker(function(cb, duration) {
 });
 
 g.events.unrealizedExplainer2 = PromiseMaker(function(cb, duration) {
-  var text = "She can pass these assets on to her heirs, ensuring that income tax will <em>never</em> be paid on those gains.";
+  var text = "If she never sells any of it, the tax liability on all of her gains goes away when she dies.";
   var obj = g.objects.unrealizedExplainer2 = $(document.createElement("div"))
     .addClass("annotation")
     .css("right","5%")
@@ -332,7 +319,7 @@ g.events.explainUnrealized = PromiseMaker(function(cb, duration) {
 });
 
 g.events.explainRealized = PromiseMaker(function(cb, duration) {
-  var text = "This income is all the IRS knows about.&nbsp;&darr;";
+  var text = "This income is all that appears on her tax return.&nbsp;&darr;";
   var obj = g.objects.realizedExplainer = $(document.createElement("div"))
     .addClass("annotation")
     .css("right","53%")
@@ -360,7 +347,7 @@ g.events.explainTax = PromiseMaker(function(cb, duration) {
 });
 
 g.events.summary = PromiseMaker(function(cb, duration) {
-  var text = "The CEO pays just around 2% of her total income in taxes in a given year.";
+  var text = "The CEO pays less than two and a half percent of her total income in taxes in a given year.";
   var obj = g.objects.summary = $(document.createElement("div"))
     .addClass("annotation")
     .css("left","0")

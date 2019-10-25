@@ -13,6 +13,7 @@
   "devDependencies": {
     "cbpp_shared_gulp": "github:CenterOnBudget/cbpp_shared_gulp",
     "download": "^7.1.0",
+    "parallel-webpack": "^2.4.0",
     "raw-loader": "^1.0.0"
   },
   "scripts": {

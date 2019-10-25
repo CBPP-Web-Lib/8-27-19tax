@@ -21,7 +21,7 @@ g.d3 = d3;
 g.$ = $;
 g.colors = colors;
 g.sel = sel;
-g.domLoaded = false; 
+g.domLoaded = false;  
 g.data = [
   [23.7,0.6,0.5,1.5,27.2],
   [8.9,2.2,1.5,0.9,13.8]
@@ -39,18 +39,18 @@ Promise.all([
 function ready() {
   var wrap = $(document.createElement("div"))
     .attr("id",id);
-  script.before(wrap); 
-  wrap.html(g.DOM);
+  script.before(wrap);
+  wrap.html(g.DOM); 
   g.svg = d3.select(".animation-inner").append("svg")
     .attr("viewBox","0 -50 100 50");
   var e = g.events;
   g.speedFactor = 1;
-  e.waitFor(200)()
-    .then(e.drawOneThousand(1000))
+  e.waitFor(2000)()
+    .then(e.drawOneThousand(1000)) 
     .then(e.describeOneThousand(1000))
     .then(e.waitFor(2000))
     .then(e.introText(1000))
-    .then(e.waitFor(1000))
+    .then(e.waitFor(2000))
     .then(e.describeSalary(1000))
     .then(doMultiple([
       e.zoomToViewBoxMaker("0 -200 400 200")(2000, 1000),
@@ -59,15 +59,15 @@ function ready() {
     ]))
     .then(doMultiple([
       e.restOfSalary(4000),
-      e.recolorStartBox(1000)
+      e.recolorStartBox(1000) 
     ]))
     .then(doMultiple([
-      e.describeSalaryTax(1000),
+      e.describeSalaryTax(1000, 1000),
       e.ordinaryIncomeTaxBlocks(4000)
     ]))
-    .then(e.waitFor(1000))
+    .then(e.waitFor(3000)) 
     .then(doMultiple([
-      e.fadeOutSalary(500),
+      e.fadeOutSalary(500),    
       e.fadeOutSalaryTax(500),
       e.fadeOutIntroText(500)
     ]))
@@ -75,21 +75,20 @@ function ready() {
       e.fadeInCover(500),
       e.fadeInStockExplainer(500)
     ]))
-    .then(e.waitFor(2000))
+    .then(e.waitFor(4000))
     .then(doMultiple([
       e.zoomToViewBoxMaker("0 -2500 5000 2500")(3000),
       e.realizedGainsExplainer(1000),
       e.fadeInCapGains(3000),
       e.fadeOutCover(500, 2500)
     ]))
-    .then(e.waitFor(1000))
+    .then(e.waitFor(4000))
     .then(doMultiple([
       e.fadeInCapGainsTax(3000),
       e.realizedGainsTaxExplainer(1000)
     ]))
-    .then(e.waitFor(2000))
+    .then(e.waitFor(4000))
     .then(e.fadeOutGains(1000))
-    
     .then(doMultiple([
       e.zoomToViewBoxMaker("0 -7800 15600 7800")(6000),
       e.fadeInCover2(500, 2000),
@@ -97,19 +96,23 @@ function ready() {
       e.unrealizedGains(3000, 2000),
       e.solidifyTax(6000)
     ]))
-    
+    .then(e.waitFor(2000))
     .then(e.unrealizedExplainer2(1000))
-    .then(e.waitFor(3000))
+    .then(e.waitFor(6000))
     .then(doMultiple([
       e.fadeOutUnrealizedExplainers(1000),
       e.moveIncome(2000),
       e.moveUnrealizedIncome(2000),
-      e.solidifyAll(2000)
+      e.solidifyAll(2000) 
     ]))
     .then(e.explainUnrealized(2000))
+    .then(e.waitFor(2000))
     .then(e.explainRealized(2000))
+    .then(e.waitFor(2000))
     .then(e.explainTax(2000))
-    .then(e.summary(2000));
+    .then(e.summary(2000))
+    .then(e.waitFor(10000))
+    .then(e.fadeOutAllAtEnd(1000));
     /*
     .then(doMultiple([
       zoomToFirstMillionView(2000),
