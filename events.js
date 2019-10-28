@@ -238,7 +238,7 @@ g.events.gainsTaxExplainer = PromiseMaker(function(cb, duration) {
 });
 
 g.events.unrealizedExplainer = PromiseMaker(function(cb, duration) {
-  var text = "She doesn’t pay any tax on the rest of the $1 billion-a-year growth in her stock, until she sells any of it.";
+  var text = "She doesn’t pay any tax on the rest of the $1 billion-a-year growth in her stock.";
   var obj = g.objects.unrealizedExplainer = $(document.createElement("div"))
     .addClass("annotation")
     .css("right","5%")
@@ -251,7 +251,8 @@ g.events.unrealizedExplainer = PromiseMaker(function(cb, duration) {
 });
 
 g.events.unrealizedExplainer2 = PromiseMaker(function(cb, duration) {
-  var text = "If she never sells any of it, the tax liability on all of her gains goes away when she dies.";
+  //var text = "If she never sells any of it, the tax liability on her unsold gains goes away when she dies.";
+  var text = "On the stocks she never sells, the income tax liability on all her gains is wiped out when she dies.";
   var obj = g.objects.unrealizedExplainer2 = $(document.createElement("div"))
     .addClass("annotation")
     .css("right","5%")
@@ -333,7 +334,7 @@ g.events.explainRealized = PromiseMaker(function(cb, duration) {
 });
 
 g.events.explainTax = PromiseMaker(function(cb, duration) {
-  var text = "This is the total federal income tax paid.<br>&darr;";
+  var text = "This is the total federal income tax that she paid.<br>&darr;"; 
   var obj = g.objects.realizedExplainer = $(document.createElement("div"))
     .addClass("annotation")
     .css("right","78.5%")
