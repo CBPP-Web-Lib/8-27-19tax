@@ -78,7 +78,7 @@ g.events.describeSalary = PromiseMaker(function(cb, duration) {
 });
 
 g.events.describeSalaryTax = PromiseMaker(function(cb, duration) {
-  var text = "...on which she pays about $365,000 in federal income and payroll taxes (not counting potential deductions).";
+  var text = "...on which she pays about $365,000 in federal income and payroll taxes (not counting potential deductions.)";
   var obj = g.objects.salaryTaxDesc = $(document.createElement("div"))
     .addClass("annotation")
     .css("right",0)
@@ -139,7 +139,7 @@ g.events.fadeInStockExplainer = PromiseMaker(function(cb, duration) {
 });
 
 g.events.realizedGainsExplainer = PromiseMaker(function(cb, duration) {
-  var text = "Now, let's assume she sells $100 million worth of stock each year, and the entire amount represents capital gain.";
+  var text = "Now, let's assume she sells $100 million worth of stock each year, and the entire amount represents a gain.";
   var obj = g.objects.realizedGainsExplainer = $(document.createElement("div"))
     .addClass("annotation")
     .css("right",0)
@@ -153,7 +153,7 @@ g.events.realizedGainsExplainer = PromiseMaker(function(cb, duration) {
 
 g.events.realizedGainsTaxExplainer = PromiseMaker(function(cb, duration) {
   console.log("hello");
-  var text = "That gain is taxed at a 23.8% rate, well below the 37% top rate on wages and salaries.";
+  var text = "That gain is taxed at a 23.8% rate (well below the 37% top rate on wages and salaries.)";
   var obj = g.objects.realizedGainsTaxExplainer = $(document.createElement("div"))
     .addClass("annotation")
     .css("right",0)
@@ -306,7 +306,7 @@ g.events.moveUnrealizedIncome = PromiseMaker(function(cb, duration) {
 });
 
 g.events.explainUnrealized = PromiseMaker(function(cb, duration) {
-  var text = "This income never even appears on the tax return.";
+  var text = "This income never even appears on her tax return.";
   var obj = g.objects.unrealizedExplainer = $(document.createElement("div"))
     .addClass("annotation")
     .css("right","8.5%")
