@@ -22,6 +22,7 @@ g.$ = $;
 g.colors = colors;
 g.sel = sel;
 g.domLoaded = false;  
+g.bracketPath = require("./pathstring.json");
 g.data = [
   [23.7,0.6,0.5,1.5,27.2],
   [8.9,2.2,1.5,0.9,13.8]
@@ -30,6 +31,13 @@ g.sums = [
   g.data[0][4],
   g.data[1][4]
 ];
+
+g.easeInPow = function(pow) {
+  return function(p) {
+    return Math.pow(p, pow);
+  };
+};
+
 Promise.all([
   new Promise(function(resolve, reject) {
     $(document).ready(resolve);
@@ -51,16 +59,33 @@ function ready() {
     .then(e.waitFor(2000))
     .then(e.introText(1000))
     .then(e.waitFor(2000))
-    .then(e.describeSalary(1000))
     .then(doMultiple([
-      e.zoomToViewBoxMaker("0 -200 400 200")(2000, 1000),
-      e.seriesOfAdditionalBlocks(3000),
+      doSequential([
+        e.seriesOfAdditionalBlocks(6000),
+        doMultiple([
+          e.recolorStartBox(1000),
+          e.millionBracket(500),
+          doSequential([
+            e.millionBracketLabel(500),
+            e.waitFor(2000),
+            e.fadeOutBracket(800)
+          ]),
+          doSequential([
+            e.secondMillion(1000),
+            e.restOfMillionBlocks(5000)
+          ])
+        ])
+      ]),
+      e.zoomToViewBoxMaker("0 -800 1600 800")(12000),
       e.fadeOutOneThousandDescription(2000, 1000)
     ]))
-    .then(doMultiple([
-      e.restOfSalary(4000),
-      e.recolorStartBox(1000) 
-    ]))
+    .then(e.highlightTwoMillion(1000))
+    .then(e.zoomToViewBoxMaker("0 -360 720 360")(2000))
+    .then(e.fadeInTax(2000))
+    .then(e.zoomToViewBoxMaker("0 -800 1600 800")(2000))
+    .then(e.unhighlightTwoMillion(1000));
+    /*
+    .then(e.recolorStartBox(1000))
     .then(doMultiple([
       e.describeSalaryTax(1000, 1000),
       e.ordinaryIncomeTaxBlocks(4000)
@@ -233,7 +258,20 @@ g.thousandSizeVert = g.millionSizeVert / g.thousandVert - g.thousandMargin + g.t
 console.log(g);
 
 
-
+var doSequential = g.doSequential =  function(arr) {
+  return function() {
+    var makePromise = function(el) {
+      return new Promise(function(resolve, reject) {
+        el().then(resolve);
+      });
+    };
+    var r = makePromise(arr[0]);
+    for (var i = 1, ii = arr.length; i<ii; i++) {
+      r = r.then(arr[i]);
+    }
+    return r;
+  };
+};
 
 
 g.fadeInNewBlocks = function(config, cb) {
@@ -253,6 +291,7 @@ g.fadeInNewBlocks = function(config, cb) {
   var color = config.color || colors[0];
   var identifier = config.identifier;
   var opacity = config.opacity || 1;
+  var easing = config.easing || function(p) {return p;}
   var modSkipList = function(list, confs) {
     for (var i = 0, ii = confs.length; i<ii; i++) {
       var conf = confs[i];
@@ -310,7 +349,6 @@ g.fadeInNewBlocks = function(config, cb) {
   var blocks, gridlessBlocks;
 
   var makeBlocks = function() {
-    console.log("xstart", xstart);
     var id = "c" + xsize + "_" + ysize + "_" + xstart + "_" + ystart + "_" + width + "_" + height + "_" + margin + "_" + color.replace("#","");
     id = id.replace(/\./g,"d");
     blocks = g.shapes.selectAll("rect." + id)
@@ -365,6 +403,7 @@ g.fadeInNewBlocks = function(config, cb) {
     if (progress > 1) {
       progress = 1;
     }
+    progress = easing(progress);
     var opacities = genOpacities(n, progress, transitionAtOnce);
     blocks.each(function(d, i) {
       d3.select(this).attr("opacity",opacities[i]);
