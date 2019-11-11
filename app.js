@@ -23,6 +23,7 @@ g.colors = colors;
 g.sel = sel;
 g.domLoaded = false;  
 g.bracketPath = require("./pathstring.json");
+g.polygonClipping = require("polygon-clipping");
 g.data = [
   [23.7,0.6,0.5,1.5,27.2],
   [8.9,2.2,1.5,0.9,13.8]
@@ -61,7 +62,10 @@ function ready() {
     .then(e.waitFor(2000))
     .then(doMultiple([
       doSequential([
-        e.seriesOfAdditionalBlocks(6000),
+        doMultiple([
+          e.oneYearHerStocks(2000),
+          e.seriesOfAdditionalBlocks(6000)
+        ]),
         doMultiple([
           e.recolorStartBox(1000),
           e.millionBracket(500),
@@ -79,11 +83,44 @@ function ready() {
       e.zoomToViewBoxMaker("0 -800 1600 800")(12000),
       e.fadeOutOneThousandDescription(2000, 1000)
     ]))
-    .then(e.highlightTwoMillion(1000))
-    .then(e.zoomToViewBoxMaker("0 -360 720 360")(2000))
-    .then(e.fadeInTax(2000))
-    .then(e.zoomToViewBoxMaker("0 -800 1600 800")(2000))
-    .then(e.unhighlightTwoMillion(1000));
+    .then(e.waitFor(3000))
+    .then(e.fadeOutSlide1(500))
+    .then(doMultiple([
+      e.supposeSheSells(500),
+      e.highlightTwoMillion(1000)
+    ]))
+    .then(e.waitFor(2000))
+    .then(doMultiple([
+      e.theTwoMillion(1000),
+      e.zoomToViewBoxMaker("0 -360 720 360")(2000)
+    ]))
+    .then(e.waitFor(2000))
+    .then(e.fadeOutSlide2(500))
+    .then(doMultiple([
+      e.fadeInTax(2000),
+      e.plus238(1000)
+    ]))
+    .then(e.waitFor(2000))
+    .then(e.thisMeansThat(500))
+    .then(e.waitFor(3000))
+    .then(doMultiple([
+      e.zoomToViewBoxMaker("0 -800 1600 800")(1000),
+      e.unhighlightTwoMillion(900)
+    ]))
+    .then(doMultiple([
+
+      e.effectiveTaxRate(2000),
+      e.makeGridless(1000, 0),
+      doSequential([
+        e.moveMillions(1100, 0),
+        e.simplifiedPath(),
+        e.animateToPie(3000)
+      ])
+    ]))
+    .then(e.waitFor(10000))
+    .then(e.fadeOutAllAtEnd(1000));
+
+    
     /*
     .then(e.recolorStartBox(1000))
     .then(doMultiple([
@@ -393,9 +430,13 @@ g.fadeInNewBlocks = function(config, cb) {
     if (config.prepend===true) {
       blocks.lower();
     }
+    return {
+      blocks: blocks,
+      gridlessBlocks: gridlessBlocks
+    };
   };
 
-  makeBlocks();
+  var objects = makeBlocks();
 
   var frame = function() {
     var now = Date.now();
@@ -416,6 +457,9 @@ g.fadeInNewBlocks = function(config, cb) {
   };
   var startTime = Date.now();
   frame();
+
+  return objects;
+
 };
 
 require("./events.js")(g);

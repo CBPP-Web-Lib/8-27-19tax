@@ -4,11 +4,12 @@
   "description": "Buffet Gif",
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
-    "cbpp_figures": "github:CenterOnBudget/cbpp_figure",
     "cbpp_colorgen": "github:CenterOnBudget/cbpp_colorgen",
+    "cbpp_figures": "github:CenterOnBudget/cbpp_figure",
     "comma-number": "^2.0.0",
     "d3": "^5.10.0",
-    "jquery": "^1.12.4"
+    "jquery": "^1.12.4",
+    "polygon-clipping": "^0.14.3"
   },
   "devDependencies": {
     "cbpp_shared_gulp": "github:CenterOnBudget/cbpp_shared_gulp",

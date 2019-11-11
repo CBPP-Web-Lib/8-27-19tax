@@ -5,12 +5,13 @@ var colors = g.colors;
 var d3 = g.d3;
 var PromiseMaker = g.PromiseMaker;
 var fadeInNewBlocks = g.fadeInNewBlocks;
+var polygonClipping = g.polygonClipping;
 g.events = {};
 g.events.drawOneThousand = PromiseMaker(function(cb, duration) {
   g.shapes = g.svg.append("g")
     .attr("class","shapes")
     .attr("transform","matrix(1 0 0 -1 0 0)");
-  fadeInNewBlocks({
+  g.objects.firstThousand = fadeInNewBlocks({
     duration:duration,
     xsize:1,
     ysize:1,
@@ -47,6 +48,120 @@ g.events.introText = PromiseMaker(function(cb, duration) {
   $(sel).find(".animation-inner").append(div);
   div.hide().fadeIn(duration, cb);
 });
+
+g.events.oneYearHerStocks = PromiseMaker(function(cb, duration) {
+  var text = "One year her stocks appreciate $10 million. Unlike if she received paychecks totaling $10 million, this capital income does not automatically get counted as income on her tax return.";
+  var div = g.objects.oneYearHerStocks = $(document.createElement("div"))
+    .css("width","44%")
+    .css("height","60%")
+    .css("position","absolute")
+    .css("top","40%")
+    .css("right",0)
+    .css("text-align","center")
+    .css("font-size","24pt")
+    .text(text);
+  $(sel).find(".animation-inner").append(div);
+  div.hide().fadeIn(duration, cb);
+});
+
+g.events.fadeOutSlide1 = PromiseMaker(function(cb, duration) {
+  g.objects.introText.fadeOut(duration, cb);
+  g.objects.oneYearHerStocks.fadeOut(duration);
+});
+
+g.events.supposeSheSells = PromiseMaker(function(cb, duration) {
+  var text = "Suppose she sells stocks with $2 million in gains to cover her expenses that year.";
+  var div = g.objects.supposeSheSells = $(document.createElement("div"))
+    .css("width","44%")
+   // .css("height","30%")
+    .css("position","absolute")
+    .css("top","15%")
+    .css("right",0)
+    .css("text-align","center")
+    .css("font-size","24pt")
+    .text(text);
+  
+  var backerDiv = $(document.createElement("div"))
+    .css("width","50%")
+    .css("height","100%")
+    .css("position","absolute")
+    .css("top",0)
+    .css("right",0)
+    .css("background-image","linear-gradient(to right, rgba(10, 80, 135, 0), rgba(10, 80, 135, 1) 10%)");
+  $(sel).find(".animation-inner").append(backerDiv);
+  $(sel).find(".animation-inner").append(div);
+  div.hide().fadeIn(duration, cb);
+});
+
+
+
+g.events.theTwoMillion = PromiseMaker(function(cb, duration) {
+  var text = "This $2 million is the only part of her $10 million gain that year that would show up on her tax return. ";
+  var div = g.objects.theTwoMillion = $(document.createElement("div"))
+    .css("width","44%")
+   // .css("height","30%")
+    .css("position","absolute")
+    .css("top","45%")
+    .css("right",0)
+    .css("text-align","center")
+    .css("font-size","24pt")
+    .text(text);
+  $(sel).find(".animation-inner").append(div);
+  div.hide().fadeIn(duration, cb);
+});
+
+g.events.fadeOutSlide2 = PromiseMaker(function(cb, duration) {
+  g.objects.supposeSheSells.fadeOut(duration, cb);
+  g.objects.theTwoMillion.fadeOut(duration);
+});
+
+g.events.plus238 = PromiseMaker(function(cb, duration) {
+  var text = "Plus, she would pay tax on it at a rate of 23.8%, well below the 37% top rate on wages and salaries."; 
+  var div = g.objects.plus238 = $(document.createElement("div"))
+    .css("width","44%")
+   // .css("height","30%")
+    .css("position","absolute")
+    .css("top","10%")
+    .css("right",0)
+    .css("text-align","center")
+    .css("font-size","24pt")
+    .text(text);
+  $(sel).find(".animation-inner").append(div);
+  div.hide().fadeIn(duration, cb);
+});
+
+g.events.thisMeansThat = PromiseMaker(function(cb, duration) {
+  var text = "This means that on $10 million of capital income she would pay $476,000 in tax..."; 
+  var div = g.objects.thisMeansThat = $(document.createElement("div"))
+    .css("width","44%")
+   // .css("height","30%")
+    .css("position","absolute")
+    .css("top","45%")
+    .css("right",0)
+    .css("text-align","center")
+    .css("font-size","24pt")
+    .text(text);
+  $(sel).find(".animation-inner").append(div);
+  div.hide().fadeIn(duration, cb);
+});
+
+g.events.effectiveTaxRate = PromiseMaker(function(cb, duration) {
+  var text = "...for an effective tax rate on this income of just 5%."; 
+  var div = g.objects.thisMeansThat = $(document.createElement("div"))
+    .css("width","44%")
+   // .css("height","30%")
+    .css("position","absolute")
+    .css("top","80%")
+    .css("right",0)
+    .css("text-align","center")
+    .css("font-size","24pt")
+    .text(text);
+  $(sel).find(".animation-inner").append(div);
+  div.hide().fadeIn(duration, cb);
+});
+
+
+
 
 g.events.millionBracket = PromiseMaker(function(cb, duration) {
   var bracket = g.objects.millionBracket = g.shapes.append("path")
@@ -107,279 +222,6 @@ g.events.describeOneThousand = PromiseMaker(function(cb, duration) {
 });
 
 
-g.events.fadeInCover = PromiseMaker(function(cb, duration) {
-  var obj = g.objects.textCover = $(document.createElement("div"))
-    .css("background","linear-gradient(to right, rgba(10, 80, 135, 0), rgba(10, 80, 135, 100) 20%)")
-    /*rgb(10, 80, 135);*/
-    .css("width","45%")
-    .css("height","100%")
-    .css("right",0)
-    .css("top",0)
-    .css("position","absolute");
-  $(sel).find(".animation-inner").append(obj);
-  console.log(obj);
-    obj.hide().fadeIn(duration, cb);
-
-});
-
-g.events.fadeInCover2 = PromiseMaker(function(cb, duration) {
-  console.log("cover 2");
-  var obj = g.objects.textCover2 = $(document.createElement("div"))
-    .css("background","linear-gradient(to right, rgba(10, 80, 135, 0), rgba(10, 80, 135, 100) 5%)")
-    /*rgb(10, 80, 135);*/
-    .css("width","60%")
-    .css("height","100%")
-    .css("right",0)
-    .css("top",0)
-    .css("position","absolute");
-  $(sel).find(".animation-inner").append(obj);
-  console.log(obj);
-    obj.hide().fadeIn(duration, cb);
-
-});
-
-g.events.fadeOutCover = PromiseMaker(function(cb, duration) {
-  g.objects.textCover.fadeOut(duration, cb);
-});
-
-g.events.fadeInStockExplainer = PromiseMaker(function(cb, duration) {
-  var text = "But most of her income comes from her large holdings of her company’s stock, which gain about $1 billion per year in value.";
-  var obj = g.objects.stockExplainer = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right",0)
-    .css("top","7%")
-    .css("width","40%")
-    .css("text-align","center")
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-g.events.realizedGainsExplainer = PromiseMaker(function(cb, duration) {
-  var text = "Now, let's assume she sells $100 million worth of stock each year, and the entire amount represents a gain.";
-  var obj = g.objects.realizedGainsExplainer = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right",0)
-    .css("top","42%")
-    .css("width","40%")
-    .css("text-align","center")
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-g.events.realizedGainsTaxExplainer = PromiseMaker(function(cb, duration) {
-  console.log("hello");
-  var text = "That gain is taxed at a 23.8% rate (well below the 37% top rate on wages and salaries.)";
-  var obj = g.objects.realizedGainsTaxExplainer = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right",0)
-    .css("top","75%")
-    .css("width","40%")
-    .css("text-align","center")
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-g.events.fadeOutGains = PromiseMaker(function(cb, duration) {
-  g.objects.realizedGainsExplainer
-    .add(g.objects.stockExplainer)
-    .add(g.objects.realizedGainsTaxExplainer)
-    .fadeOut(duration, cb);
-
-
-});
-
-g.events.unrealizedGains = PromiseMaker(function(cb, duration) {
-  fadeInNewBlocks({
-    duration: duration,
-    width: g.millionSizeHoz,
-    height: g.millionSizeVert,
-    margin: g.millionMargin,
-    identifier: "unrealizedGains",
-    xsize:25,
-    ysize:40,
-    xstart: g.millionSizeHoz + g.millionMargin,
-    skipArray:[{rows: 10, cols: 10, rowstart: 0, colstart: 0}],
-    transitionAtOnce:10,
-    color:"#69879b",
-    verticalOrder:true
-  }, cb);
-});
-
-
-g.events.fadeInCapGains = PromiseMaker(function(cb, duration) {
-  fadeInNewBlocks({
-    duration: duration,
-    width: g.millionSizeHoz,
-    height: g.millionSizeVert,
-    margin: g.millionMargin,
-    identifier: "realizedCapGains",
-    xsize:10,
-    ysize:10,
-    xstart: g.millionSizeHoz + g.millionMargin,
-    transitionAtOnce:5,
-    color:colors[1],
-    prepend:true
-  }, cb);
-});
-
-g.events.fadeInCapGainsTax = PromiseMaker(function(cb, duration) {
-  fadeInNewBlocks({
-    duration: duration,
-    width: g.millionSizeHoz,
-    height: g.millionSizeVert,
-    margin: g.millionMargin,
-    identifier: "realizedCapGainsTax",
-    xsize:10,
-    ysize:3,
-    xstart: g.millionSizeHoz + g.millionMargin,
-    skipArray:[{rows: 1, cols: 6, rowstart: 2, colstart: 4}],
-    transitionAtOnce:5,
-    color:"#C75459"
-  }, cb);
-});
-
-g.events.gainsTaxExplainer = PromiseMaker(function(cb, duration) {
-  var text = "This capital gains income is taxed at a 23.8% rate, well below the 37% top rate on wages and salaries.";
-  var obj = g.objects.gainsTaxExplainer = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right",0)
-    .css("width","30%")
-    .css("text-align","center")
-    .css("top","60%")
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-g.events.unrealizedExplainer = PromiseMaker(function(cb, duration) {
-  var text = "She doesn’t pay any tax on the rest of the $1 billion-a-year growth in her stock.";
-  var obj = g.objects.unrealizedExplainer = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right","5%")
-    .css("width","50%")
-    .css("text-align","center")
-    .css("top","20%")
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-g.events.unrealizedExplainer2 = PromiseMaker(function(cb, duration) {
-  //var text = "If she never sells any of it, the tax liability on her unsold gains goes away when she dies.";
-  var text = "On the stocks she never sells, the income tax liability on all her gains is wiped out when she dies.";
-  var obj = g.objects.unrealizedExplainer2 = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right","5%")
-    .css("width","50%")
-    .css("text-align","center")
-    .css("top","45%")
-    .html(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-
-});
-
-g.events.fadeOutUnrealizedExplainers = PromiseMaker(function(cb, duration) {
-  g.objects.unrealizedExplainer
-    .add(g.objects.unrealizedExplainer2)
-    .add(g.objects.textCover2)
-    .fadeOut(duration, cb);
-});
-
-g.events.moveIncome = PromiseMaker(function(cb, duration) {
-  var identifiers = [
-    'restOfSalary',
-    'realizedCapGains',
-    'firstThousand'
-  ];
-  var sel = [];
-  identifiers.forEach(function(i) {
-    sel.push("rect[data-identifier='" + i + "']");
-  });
-  var income = g.svg.selectAll(sel.join(", ")).transition()
-    .duration(duration)
-    .attr("x", function() {
-      var start = d3.select(this).attr("x")*1;
-      return start + (g.millionSizeHoz + g.millionMargin)*20;
-    })
-    .attr("opacity",1)
-    .on("end", cb);    
-});
-
-g.events.moveUnrealizedIncome = PromiseMaker(function(cb, duration) {
-  g.svg.selectAll("rect[data-identifier='unrealizedGains']")
-    .transition()
-    .duration(duration)
-    .attr("x", function() {
-      var start = d3.select(this).attr("x")*1;
-      //console.log(this);
-      return start + (g.millionSizeHoz + g.millionMargin)*35;
-    })
-    .attr("opacity",1)
-    .on("end", cb);
-});
-
-g.events.explainUnrealized = PromiseMaker(function(cb, duration) {
-  var text = "This income never even appears on her tax return.";
-  var obj = g.objects.unrealizedExplainer = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right","8.5%")
-    .css("width","35%")
-    .css("text-align","center")
-    .css("top","40%")
-    .css("line-height",1.1)
-    .text(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-g.events.explainRealized = PromiseMaker(function(cb, duration) {
-  var text = "This income is all that appears on her tax return.&nbsp;&darr;";
-  var obj = g.objects.realizedExplainer = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right","53%")
-    .css("width","20%")
-    .css("text-align","right")
-    .css("top","55%")
-    .css("line-height",1.1)
-    .html(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-g.events.explainTax = PromiseMaker(function(cb, duration) {
-  var text = "This is the total federal income tax that she paid.<br>&darr;"; 
-  var obj = g.objects.realizedExplainer = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("right","78.5%")
-    .css("width","20%")
-    .css("text-align","left")
-    .css("top","66%")
-    .css("line-height",1.1)
-    .html(text);
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-g.events.summary = PromiseMaker(function(cb, duration) {
-  var text = "The CEO pays less than two and a half percent of her total income in taxes in a given year.";
-  var obj = g.objects.summary = $(document.createElement("div"))
-    .addClass("annotation")
-    .css("left","0")
-    .css("width","50%")
-    .css("text-align","left")
-    .css("top","10%")
-    .css("line-height",1.1)
-    .css("font-size","35px")
-    .html(text); 
-  $(sel).find(".animation-inner").append(obj);
-    obj.hide().fadeIn(duration, cb);
-});
-
-
 
 
 function svgCoordsToPercentOfViewBox(x, y) {
@@ -393,16 +235,8 @@ g.events.fadeOutOneThousandDescription = PromiseMaker(function(cb, duration) {
   g.objects.describeOneThousand.fadeOut(duration, cb);
 });
 
-g.events.fadeOutSalaryTax = PromiseMaker(function(cb, duration) {
-  g.objects.salaryTaxDesc.fadeOut(duration, cb);
-});
-
-g.events.fadeOutSalary = PromiseMaker(function(cb, duration) {
-  g.objects.salaryDesc.fadeOut(duration, cb);
-});
-
 g.events.seriesOfAdditionalBlocks = PromiseMaker(function(cb, duration) {
-  fadeInNewBlocks({
+  g.objects.additionalBlocks = fadeInNewBlocks({
     skipList:{0:{0:true}},
     duration:duration,
     width: g.thousandSizeHoz,
@@ -417,7 +251,7 @@ g.events.seriesOfAdditionalBlocks = PromiseMaker(function(cb, duration) {
 });
 
 g.events.secondMillion = PromiseMaker(function(cb, duration) {
-  fadeInNewBlocks({
+  g.objects.secondMillion = fadeInNewBlocks({
     duration:duration,
     width: g.millionSizeHoz,
     height: g.millionSizeVert,
@@ -432,7 +266,7 @@ g.events.secondMillion = PromiseMaker(function(cb, duration) {
 });
 
 g.events.restOfMillionBlocks = PromiseMaker(function(cb, duration) {
-  fadeInNewBlocks({
+  g.objects.millionBlocks = fadeInNewBlocks({
     skipList:{
       0:{
         0:true,
@@ -475,7 +309,7 @@ g.events.unhighlightTwoMillion = PromiseMaker(function(cb, duration) {
 });
 
 g.events.fadeInTax = PromiseMaker(function(cb, duration) {
-  fadeInNewBlocks({
+  g.objects.tax = fadeInNewBlocks({
     skipArray:[{rows: 1, cols: 4, rowstart: 11, colstart: 36}],
     duration:duration,
     width: g.thousandSizeHoz,
@@ -491,21 +325,6 @@ g.events.fadeInTax = PromiseMaker(function(cb, duration) {
   }, cb);
 });
 
-g.events.ordinaryIncomeTaxBlocks = PromiseMaker(function(cb, duration) {
-  fadeInNewBlocks({
-    duration:duration,
-    width: g.thousandSizeHoz,
-    height: g.thousandSizeVert,
-    margin: g.thousandMargin,
-    xsize:40,
-    ysize:10,
-    color:"#C75459",
-    identifier:"ordinaryTax",
-    skipArray:[{rows: 1, cols: 35, rowstart: 9, colstart: 5}],
-    transitionAtOnce:50
-  }, cb);
-});
-
 g.events.zoomToViewBoxMaker = function(viewbox) {
   return PromiseMaker(function(cb, duration) {
     g.svg.transition()
@@ -517,6 +336,340 @@ g.events.zoomToViewBoxMaker = function(viewbox) {
       });
   });
 };
+
+g.events.makeGridless = PromiseMaker(function(cb, duration) {
+  var nodes = g.svg.selectAll("[data-gridless='true']")
+    .filter(function() {
+      var identifier = d3.select(this).attr("data-identifier");
+      return {
+        "additionalBlocks":true,
+        "tax":true,
+        "firstThousand":true
+      }[identifier];
+    })
+    .raise()
+    .transition()
+    .duration(duration)
+    .attr("opacity",1)
+    .on("end", cb);
+});
+
+g.events.moveMillions = PromiseMaker(function(cb, duration) {
+  var millions = g.objects.millionBlocks.blocks;
+  var secondMillion = g.objects.secondMillion.blocks;
+  millions.transition()
+    .duration(duration)
+    .attr("x", function(d) {
+      var x= d3.select(this).attr("x");
+      return x - g.millionMargin*d[0];
+    })
+    .attr("y", function(d) {
+      var y = d3.select(this).attr("y");
+      return y - g.millionMargin*d[1];
+    })
+    .attr("width", function() {
+      return d3.select(this).attr("width")*1.01;
+    })
+    .attr("height", function() {
+      return d3.select(this).attr("height")*1.01;
+    })
+    .on("end", cb);
+  secondMillion.transition()
+    .duration(duration)
+    .attr("y", function() {
+      var y = d3.select(this).attr("y");
+      return y - g.millionMargin;
+    })
+    .attr("width", function() {
+      return d3.select(this).attr("width")*1.01;
+    })
+    .attr("height", function() {
+      return d3.select(this).attr("height")*1.01;
+    });
+});
+
+g.events.simplifiedPath = PromiseMaker(function(cb, duration) {
+  var polygonListFromSelection = function(selection) {
+    var list = [];
+    selection.each(function() {
+      var obj = d3.select(this);
+      var x = obj.attr("x")*1;
+      var y = obj.attr("y")*1;
+      var width = obj.attr("width")*1;
+      var height = obj.attr("height")*1;
+      list.push([[
+        [x, y],
+        [x + width, y],
+        [x + width, y + height],
+        [x, y + height],
+        [x, y]
+      ]]);
+    });
+    return list;
+  };
+  
+  var tax = polygonListFromSelection(g.objects.tax.gridlessBlocks);
+  var income = polygonListFromSelection(
+    g.objects.firstThousand.gridlessBlocks
+  ).concat(polygonListFromSelection(
+    g.objects.additionalBlocks.gridlessBlocks
+  )).concat(polygonListFromSelection(
+    g.objects.secondMillion.blocks
+    )).concat(polygonListFromSelection(
+    g.objects.millionBlocks.blocks
+  ));
+  
+  var pathString = function(polygon) {
+    var str = "M" + polygon[0][0][0].join(",");
+    for (var i = 1, ii = polygon[0][0].length; i<ii; i++) {
+      str += ("L" + polygon[0][0][i].join(","));
+    }
+    str += "z";
+    return str;
+  };
+
+
+
+  var combinedTax = pathString(polygonClipping.union.call(null, tax));
+  var combinedIncome = pathString(polygonClipping.union.call(null, income));
+
+  g.objects.combinedIncome = g.shapes.append("path")
+  .attr("d", combinedIncome)
+  .attr("stroke-width",0)
+  .attr("fill",colors[0]);
+
+  g.objects.combinedTax = g.shapes.append("path")
+    .attr("d", combinedTax)
+    .attr("stroke-width",0)
+    .attr("fill", "#C75459");
+
+  g.objects.firstThousand.blocks.remove();
+  g.objects.firstThousand.gridlessBlocks.remove();
+  g.objects.additionalBlocks.blocks.remove();
+  g.objects.additionalBlocks.gridlessBlocks.remove();
+  g.objects.secondMillion.blocks.remove();
+  g.objects.secondMillion.gridlessBlocks.remove();
+  g.objects.millionBlocks.blocks.remove();
+  g.objects.millionBlocks.gridlessBlocks.remove();
+  g.objects.tax.blocks.remove();
+  g.objects.tax.gridlessBlocks.remove();
+  cb();
+});
+
+g.events.animateToPie = PromiseMaker(function(cb, duration) {
+  var toBasicRect = function(path) {
+    var pathString = path.attr("d");
+    var bbox = path.node().getBBox();
+    pathString = pathString.split("M")[1];
+    pathString = pathString.split("z")[0];
+    pathString = pathString.split("L");
+  
+    for (var i = 0, ii = pathString.length; i<ii; i++) {
+      pathString[i] = pathString[i].split(",");
+      pathString[i][0]*=1;
+      pathString[i][1]*=1;
+    }
+    var area = d3.polygonArea(pathString);
+    var point_in_rect = function(coord, box) {
+      if (coord[0]-0.06 <= box.x) {
+        return false;
+      }
+      if (coord[0]+0.06 >= box.x + box.width) {
+        return false;
+      }
+      if (coord[1]-0.06 <= box.y) {
+        return false;
+      }
+      if (coord[1]+0.06 >= box.y + box.height) {
+        return false;
+      }
+      return true;
+    };
+
+    var point_above = function(coord, box) {
+      if (coord[1]+0.001 >= box.y + box.height) {
+        return true;
+      }
+      return false;
+    };
+
+    
+    var newHeight = Math.abs(area/bbox.width);
+    var newPath = [];
+
+
+
+    for (i = 0, ii = pathString.length; i<ii; i++) {
+      if (point_in_rect(pathString[i], bbox)) {
+        newPath[i] = [bbox.x + bbox.width, bbox.y + newHeight];
+      } else if (point_above(pathString[i], bbox)) {
+        newPath[i] = [pathString[i][0], bbox.y + newHeight];
+      } else {
+        newPath[i] = pathString[i];
+      }
+    }
+
+    var newPathStringGen = function(path) {
+      var str = "M" + path[0].join(",");
+      for (var i = 1, ii = path.length; i<ii; i++) {
+        str += "L" + path[i].join(",");
+      }
+      str += "z";
+      return str;
+    };
+
+    var newString = newPathStringGen(newPath);
+
+    return {path:newString, area:area};
+
+
+  };
+  var newCombinedTax = toBasicRect(g.objects.combinedTax);
+  var newCombinedIncome = toBasicRect(g.objects.combinedIncome);
+
+  var rectElement = function(orgPath) {
+    var bbox = orgPath.getBBox();
+    var fill = d3.select(orgPath).attr("fill");
+    d3.select(orgPath).remove();
+    return g.shapes.append("rect")
+      .attr("x", bbox.x)
+      .attr("y", bbox.y)
+      .attr("width", bbox.width)
+      .attr("height", bbox.height)
+      .attr("stroke-width",0)
+      .attr("fill", fill);
+  };
+
+  g.objects.combinedTax
+    .transition()
+    .duration(duration/2.1)
+    .ease(d3.easeQuadIn)
+    .attr("d", newCombinedTax.path)
+    .on("end", function() {
+      g.objects.combinedTax = rectElement(this);
+      g.objects.combinedTax.raise();
+    });
+  g.objects.combinedIncome
+    .transition()
+    .duration(duration/2)
+    .ease(d3.easeQuadIn)
+    .attr("d", newCombinedIncome.path)
+    .on("end", function() {
+      g.objects.combinedIncome = rectElement(this);
+      g.objects.combinedIncome.lower();
+      var circleParms = transitionRectToCircle(g.objects.combinedIncome, function() {
+        g.objects.combinedIncome.lower();
+        g.objects.combinedTax.raise();
+      }, 100, 100, duration/2);
+      circleParms.angle = newCombinedTax.area/newCombinedIncome.area * Math.PI*2;
+      g.objects.combinedTax = transitionRectToArc(g.objects.combinedTax, circleParms, duration/2, function() {
+        g.objects.combinedIncome.lower();
+        g.objects.combinedTax.raise();
+        cb();
+      });
+      
+    });
+
+  function transitionRectToArc(rect, parms, duration, cb) {
+
+    var arcPath = "M" + parms.x + "," + (parms.y - parms.r);
+    arcPath += " A" + parms.r + " " + parms.r;
+    arcPath += " 0 0 0";
+    arcPath += " " + (parms.x - Math.sin(parms.angle)*parms.r);
+    arcPath += " " + (parms.y - Math.cos(parms.angle)*parms.r);
+    var rectCoords = rect.node().getBBox();
+    arcPath +=  "L" + (parms.x - Math.sin(parms.angle)*parms.r) + "," + (parms.y - Math.cos(parms.angle)*parms.r) + 
+      "L" + (parms.x - Math.sin(parms.angle)*parms.r) + "," + (parms.y - Math.cos(parms.angle)*parms.r) + 
+      "L" + parms.x + "," + parms.y + "z";
+    
+
+    var startPath = "M " +
+      (rectCoords.x + rectCoords.width) + "," + rectCoords.y;
+    startPath += " A" + parms.r + " " + parms.r;
+    startPath += " 0 0 0 "; 
+    startPath += (rectCoords.x + rectCoords.width) + "," + rectCoords.y;
+    startPath += "L" + rectCoords.x + "," + rectCoords.y +
+      "L" + rectCoords.x + "," + (rectCoords.y + rectCoords.height) + 
+      "L" + (rectCoords.x + rectCoords.width) + "," + (rectCoords.y + rectCoords.height) + "z";
+
+    var fill = rect.attr("fill");
+    rect.remove();
+    var newPath = g.shapes.append("path")
+      .attr("d", startPath)
+      .attr("fill", fill)
+      .attr("stroke-width",0);
+    newPath.raise();
+    newPath.transition()
+      .duration(duration)
+      .ease(d3.easeQuadOut)
+      .attr("d", arcPath)
+      .on("end", cb);
+    return newPath;
+
+  }
+
+  function transitionRectToCircle(rect, cb, xgain, ygain, duration) {
+    var width = rect.attr("width")*1;
+    var height = rect.attr("height")*1;
+    var area = (width)*height;
+    var reduced_visual_area = (width*height);
+    console.log(width, height);
+    var radius = Math.sqrt(area/Math.PI);
+    var fill = rect.attr("fill");
+    var x = rect.attr("x")*1;
+    var y = rect.attr("y")*1;
+    var xdiff = (radius*2 - width)/2 - xgain;
+    var ydiff = (radius*2 - height)/2 - ygain;
+    var transitionOngoing = true;
+    rect.attr("rx",0)
+      .attr("ry",0)
+      .attr("data-progress",0);
+    rect.transition()
+      .duration(duration)
+      .ease(d3.easeQuadOut)
+      .attr("x", x - xdiff)
+      .attr("y", y - ydiff)
+      .attr("rx",radius)
+      .attr("ry",radius)
+      .attr("data-progress",1)
+      .attr("width", 2*radius)
+      .on("end", function() {
+        transitionOngoing = false;
+        g.shapes.append("circle")
+          .attr("cx", x - xdiff + radius)
+          .attr("cy", y - ydiff + radius)
+          .attr("r",radius)
+          .attr("fill", fill)
+          .attr("stroke","none")
+          .attr("class", rect.attr("class"));
+        rect.remove();
+        if (typeof(cb)==="function") {cb();}
+      });
+    var holdAreaConstant = function() {
+      var radius = rect.attr("rx")*1;
+      var radius_sq = Math.pow(radius,2);
+      var width = rect.attr("width")*1;
+      var progress = rect.attr("data-progress");
+      var frame_area = (area - reduced_visual_area)*progress + reduced_visual_area;
+      var height = (frame_area + 4*radius_sq - Math.PI*radius_sq)/width;
+      rect.attr("height",height);
+      if (transitionOngoing) {
+        window.requestAnimationFrame(holdAreaConstant);
+      }
+    };
+    window.requestAnimationFrame(holdAreaConstant);
+    
+    return {
+      x: x - xdiff + radius,
+      y: y - ydiff + radius,
+      r: radius
+    };
+
+  }
+
+  
+
+});
 
 
 /*
@@ -584,39 +737,8 @@ var TextLocker = function() {
 };
 
 g.events.fadeOutAllAtEnd = PromiseMaker(function(cb, duration) {
-  $(g.svg.node()).fadeOut(duration, cb);
-  $(sel).find(".annotation").fadeOut(duration);
-});
-
-
-g.events.solidifyTax = PromiseMaker(function(cb, duration) {
-  var identifiers = [
-    "ordinaryTax"
-  ];
-  var selector = [];
-  identifiers.forEach(function(el) {
-    selector.push("[data-identifier='" + el + "']");
-  });
-  selector = selector.join(",");
-  var gridTax = g.svg.selectAll(selector).filter(function() {
-    return d3.select(this).attr("data-gridless")===true;
-  });
-  var gridlessTax = g.svg.selectAll(selector).filter("[data-gridless]");
-  gridlessTax.transition()
-    .duration(duration)
-    .attr("opacity",1)
-    .on("end", cb);
-  gridTax.transition()
-    .duration(duration)
-    .attr("opacity",0);
-});
-
-g.events.solidifyAll = PromiseMaker(function(cb, duration) {
-  g.svg.selectAll("[data-identifier='realizedCapGainsTax']")
-    .transition()
-    .duration(duration)
-    .attr("opacity",1)
-    .on("end", cb);
+  console.log($(sel).find(".animation-inner"));
+  $(sel).find(".animation-inner").fadeOut(duration, cb);
 });
 
 var textLocks = new TextLocker();
