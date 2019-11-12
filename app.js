@@ -80,7 +80,7 @@ function ready() {
           ])
         ])
       ]),
-      e.zoomToViewBoxMaker("0 -800 1600 800")(12000),
+      e.zoomToViewBoxMaker("-200 -1000 2000 1000")(12000),
       e.fadeOutOneThousandDescription(2000, 1000)
     ]))
     .then(e.waitFor(3000))
@@ -92,20 +92,20 @@ function ready() {
     .then(e.waitFor(2000))
     .then(doMultiple([
       e.theTwoMillion(1000),
-      e.zoomToViewBoxMaker("0 -360 720 360")(2000)
+      e.zoomToViewBoxMaker("-160 -360 720 360")(2000)
     ]))
     .then(e.waitFor(2000))
     .then(e.fadeOutSlide2(500))
     .then(doMultiple([
-      e.fadeInTax(2000),
+      e.fadeInTax(3500),
       e.plus238(1000)
     ]))
-    .then(e.waitFor(2000))
+    .then(e.waitFor(500))
     .then(e.thisMeansThat(500))
     .then(e.waitFor(3000))
     .then(doMultiple([
-      e.zoomToViewBoxMaker("0 -800 1600 800")(1000),
-      e.unhighlightTwoMillion(900)
+      e.zoomToViewBoxMaker("-200 -1000 2000 1000")(2500),
+      e.unhighlightTwoMillion(2000, 500)
     ]))
     .then(doMultiple([
 

@@ -35,7 +35,7 @@ g.events.recolorStartBox = PromiseMaker(function(cb, duration) {
 });
 
 g.events.introText = PromiseMaker(function(cb, duration) {
-  var text = "Imagine a wealthy person whose income comes mostly from her investments in the stock market.";
+  var text = "Imagine a wealthy person whose income comes mostly from investments in the stock market.";
   var div = g.objects.introText = $(document.createElement("div"))
     .css("width","44%")
     .css("height","60%")
@@ -50,7 +50,7 @@ g.events.introText = PromiseMaker(function(cb, duration) {
 });
 
 g.events.oneYearHerStocks = PromiseMaker(function(cb, duration) {
-  var text = "One year her stocks appreciate $10 million. Unlike if she received paychecks totaling $10 million, this capital income does not automatically get counted as income on her tax return.";
+  var text = "One year her stocks appreciate by $10 million. This income doesn’t count as income on her tax return unless she sells the stock. (Wages and salaries, in contrast, count as income in the year a worker earns them.)";
   var div = g.objects.oneYearHerStocks = $(document.createElement("div"))
     .css("width","44%")
     .css("height","60%")
@@ -70,7 +70,7 @@ g.events.fadeOutSlide1 = PromiseMaker(function(cb, duration) {
 });
 
 g.events.supposeSheSells = PromiseMaker(function(cb, duration) {
-  var text = "Suppose she sells stocks with $2 million in gains to cover her expenses that year.";
+  var text = "Suppose she sells stocks with $2 million in gains.";
   var div = g.objects.supposeSheSells = $(document.createElement("div"))
     .css("width","44%")
    // .css("height","30%")
@@ -82,12 +82,12 @@ g.events.supposeSheSells = PromiseMaker(function(cb, duration) {
     .text(text);
   
   var backerDiv = $(document.createElement("div"))
-    .css("width","50%")
+    .css("width","47%")
     .css("height","100%")
     .css("position","absolute")
     .css("top",0)
     .css("right",0)
-    .css("background-image","linear-gradient(to right, rgba(10, 80, 135, 0), rgba(10, 80, 135, 1) 10%)");
+    .css("background-image","linear-gradient(to right, rgba(10, 80, 135, 0), rgba(10, 80, 135, 1) 5%)");
   $(sel).find(".animation-inner").append(backerDiv);
   $(sel).find(".animation-inner").append(div);
   div.hide().fadeIn(duration, cb);
@@ -96,7 +96,7 @@ g.events.supposeSheSells = PromiseMaker(function(cb, duration) {
 
 
 g.events.theTwoMillion = PromiseMaker(function(cb, duration) {
-  var text = "This $2 million is the only part of her $10 million gain that year that would show up on her tax return. ";
+  var text = "This $2 million is the only part of her $10 million gain that shows up on her tax return.";
   var div = g.objects.theTwoMillion = $(document.createElement("div"))
     .css("width","44%")
    // .css("height","30%")
@@ -116,7 +116,7 @@ g.events.fadeOutSlide2 = PromiseMaker(function(cb, duration) {
 });
 
 g.events.plus238 = PromiseMaker(function(cb, duration) {
-  var text = "Plus, she would pay tax on it at a rate of 23.8%, well below the 37% top rate on wages and salaries."; 
+  var text = "Plus, her tax rate on the $2 million is 23.8%, well below the 37% top rate on wages and salaries."; 
   var div = g.objects.plus238 = $(document.createElement("div"))
     .css("width","44%")
    // .css("height","30%")
@@ -131,7 +131,7 @@ g.events.plus238 = PromiseMaker(function(cb, duration) {
 });
 
 g.events.thisMeansThat = PromiseMaker(function(cb, duration) {
-  var text = "This means that on $10 million of capital income she would pay $476,000 in tax..."; 
+  var text = "This means that on $10 million of income that year she pays $476,000 in tax..."; 
   var div = g.objects.thisMeansThat = $(document.createElement("div"))
     .css("width","44%")
    // .css("height","30%")
@@ -146,7 +146,7 @@ g.events.thisMeansThat = PromiseMaker(function(cb, duration) {
 });
 
 g.events.effectiveTaxRate = PromiseMaker(function(cb, duration) {
-  var text = "...for an effective tax rate on this income of just 5%."; 
+  var text = "...for an effective tax rate on this income of 5%."; 
   var div = g.objects.thisMeansThat = $(document.createElement("div"))
     .css("width","44%")
    // .css("height","30%")
@@ -271,18 +271,18 @@ g.events.restOfMillionBlocks = PromiseMaker(function(cb, duration) {
       0:{
         0:true,
         1:true,
-      },
-      2: {
+      }
+      /*2: {
         2: true,
         3: true
-      }
+      }*/
     },
     duration:duration,
     width: g.millionSizeHoz,
     height: g.millionSizeVert,
     margin: g.millionMargin,
-    xsize:3,
-    ysize:4,
+    xsize:2,
+    ysize:5,
     verticalOrder: true,
     easing: g.easeInPow(2),
     transitionAtOnce:2,
@@ -542,7 +542,7 @@ g.events.animateToPie = PromiseMaker(function(cb, duration) {
 
   g.objects.combinedTax
     .transition()
-    .duration(duration/2.1)
+    .duration(duration/4.1)
     .ease(d3.easeQuadIn)
     .attr("d", newCombinedTax.path)
     .on("end", function() {
@@ -551,7 +551,7 @@ g.events.animateToPie = PromiseMaker(function(cb, duration) {
     });
   g.objects.combinedIncome
     .transition()
-    .duration(duration/2)
+    .duration(duration/4)
     .ease(d3.easeQuadIn)
     .attr("d", newCombinedIncome.path)
     .on("end", function() {
@@ -560,9 +560,9 @@ g.events.animateToPie = PromiseMaker(function(cb, duration) {
       var circleParms = transitionRectToCircle(g.objects.combinedIncome, function() {
         g.objects.combinedIncome.lower();
         g.objects.combinedTax.raise();
-      }, 100, 100, duration/2);
+      }, 100, 100, 3*duration/4);
       circleParms.angle = newCombinedTax.area/newCombinedIncome.area * Math.PI*2;
-      g.objects.combinedTax = transitionRectToArc(g.objects.combinedTax, circleParms, duration/2, function() {
+      g.objects.combinedTax = transitionRectToArc(g.objects.combinedTax, circleParms, 3*duration/4, function() {
         g.objects.combinedIncome.lower();
         g.objects.combinedTax.raise();
         cb();
