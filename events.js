@@ -40,7 +40,7 @@ g.events.introText = PromiseMaker(function(cb, duration) {
     .css("width","44%")
     .css("height","60%")
     .css("position","absolute")
-    .css("top","10%")
+    .css("top","5%")
     .css("right",0)
     .css("text-align","center")
     .css("font-size","24pt")
@@ -50,12 +50,12 @@ g.events.introText = PromiseMaker(function(cb, duration) {
 });
 
 g.events.oneYearHerStocks = PromiseMaker(function(cb, duration) {
-  var text = "One year her stocks appreciate by $10 million. This income doesn’t count as income on her tax return unless she sells the stock. (Wages and salaries, in contrast, count as income in the year a worker earns them.)";
+  var text = "One year her stocks appreciate by $10 million in value. This income doesn’t count as income on her tax return unless she sells the stock and realizes the gain. (Wages and salaries, in contrast, count as income in the year a worker earns them.)";
   var div = g.objects.oneYearHerStocks = $(document.createElement("div"))
     .css("width","44%")
     .css("height","60%")
     .css("position","absolute")
-    .css("top","40%")
+    .css("top","35%")
     .css("right",0)
     .css("text-align","center")
     .css("font-size","24pt")
@@ -131,7 +131,7 @@ g.events.plus238 = PromiseMaker(function(cb, duration) {
 });
 
 g.events.thisMeansThat = PromiseMaker(function(cb, duration) {
-  var text = "This means that on $10 million of income that year she pays $476,000 in tax..."; 
+  var text = "This means that on $10 million of income that year, she pays $476,000 in tax..."; 
   var div = g.objects.thisMeansThat = $(document.createElement("div"))
     .css("width","44%")
    // .css("height","30%")
