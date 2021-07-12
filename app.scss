@@ -17,7 +17,7 @@ $yellow:#FFCE6D;
     border:1px solid #fff;
   }
   color:#fff;
-  font-family:"proxima nova condensed",sans-serif;
+  font-family:proxima-nova-condensed,sans-serif;
   box-sizing:border-box;
   .barLabel {
     vertical-align:middle;
@@ -41,6 +41,7 @@ $yellow:#FFCE6D;
     position:absolute;
     color:#ECF2F8;
     font-size:20pt;
+    font-weight:400;
   }
   .animation-wrap, .animation-inner, .animation-inner > svg {
     overflow:hidden;

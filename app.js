@@ -76,13 +76,14 @@ function ready() {
       e.fadeInStockExplainer(500)
     ]))
     .then(e.waitFor(4000))
+    .then(e.realizedGainsExplainer(1000))
+    .then(e.waitFor(1000))
     .then(doMultiple([
       e.zoomToViewBoxMaker("0 -2500 5000 2500")(3000),
-      e.realizedGainsExplainer(1000),
       e.fadeInCapGains(3000),
       e.fadeOutCover(500, 2500)
     ]))
-    .then(e.waitFor(4000))
+    .then(e.waitFor(2000))
     .then(doMultiple([
       e.fadeInCapGainsTax(3000),
       e.realizedGainsTaxExplainer(1000)
