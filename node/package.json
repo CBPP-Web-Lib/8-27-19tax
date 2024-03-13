@@ -1,0 +1,33 @@
+{
+  "name": "tax8-27-19",
+  "version": "0.0.1",
+  "description": "Brief description of package",
+  "scripts": {},
+  "author": "Nick Kasprak",
+  "license": "MIT",
+  "dependencies": {
+    "cbpp_colorgen": "git+https://git@github.com/CBPP-Web-Lib/cbpp_colorgen",
+    "cbpp_figure": "git+https://git@github.com/CBPP-Web-Lib/CBPP_Figure",
+    "comma-number": "^2.0.0",
+    "d3": "^7.9.0",
+    "download": "^8.0.0",
+    "jquery": "^3.7.1",
+    "polygon-clipping": "^0.15.7"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.1",
+    "@babel/preset-env": "^7.11.0",
+    "axios": "^0.26.0",
+    "babel-loader": "^8.1.0",
+    "core-js": "^3.6.5",
+    "css-loader": "^4.2.1",
+    "d3-color": "^1.4.1",
+    "dart-sass": "^1.25.0",
+    "randomstring": "^1.1.5",
+    "raw-loader": "^4.0.2",
+    "sass": "^1.26.10",
+    "sass-loader": "^9.0.3",
+    "style-loader": "^1.3.0",
+    "webpack-cli": "^5"
+  }
+}

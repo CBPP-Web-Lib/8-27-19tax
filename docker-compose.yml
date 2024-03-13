@@ -1,0 +1,41 @@
+version: '3'
+services:
+    apache-dev:
+        volumes:
+            - ./node/dev:/var/www/html/js:rw
+            - ./html:/var/www/html:rw
+            - ./php.ini:/usr/local/etc/php/conf.d/php.ini:rw
+        build:
+            context: .
+            dockerfile: services/apache/Dockerfile
+        ports:
+            - "8080:80"
+        container_name: tax8-27-19-dev
+    apache-prod:
+        volumes:
+            - ./node/prod:/var/www/html/js:rw
+            - ./html:/var/www/html:rw
+            - ./php.ini:/usr/local/etc/php/conf.d/php.ini:rw
+        build:
+            context: .
+            dockerfile: services/apache/Dockerfile
+        ports:
+            - "8081:80"
+        container_name: tax8-27-19-prod
+    node-build:
+        volumes:
+            - ./node:/opt/project/app:rw
+            - ./services/build/webpack.config.js:/opt/project/webpack.config.js:rw
+        build:
+            context: .
+            dockerfile: services/watch/Dockerfile
+        user: ${UID}:${GID}
+    node-watch:
+        volumes:
+            - ./node:/opt/project/app:rw
+            - ./services/watch/webpack.config.js:/opt/project/webpack.config.js:rw
+        build:
+            context: .
+            dockerfile: services/watch/Dockerfile
+        container_name: tax8-27-19-watch
+        user: ${UID}:${GID}

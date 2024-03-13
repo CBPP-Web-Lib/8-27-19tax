@@ -1,0 +1,1 @@
+docker exec -u $UID tax8-27-19-watch node $1

@@ -1,0 +1,1 @@
+docker exec -it -w /opt/project/app tax8-27-19-watch /bin/bash

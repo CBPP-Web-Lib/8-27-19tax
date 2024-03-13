@@ -1,6 +1,9 @@
-node_modules/
-intermediate/
+node_modules
+node/shp
+node/zip
+node/geojson
 package-lock.json
-build/
-.DS_Store
-Bravura.woff2
+html/vendor
+html/composer.lock
+.env
+*.woff2
